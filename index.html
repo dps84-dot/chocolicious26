@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choco.olicious26 | Handcrafted Luxury Homemade Chocolates</title>
+  <meta name="description" content="Choco.olicious26 - Freshly homemade artisan dark chocolates, truffles, and custom gift hampers in India. Order via WhatsApp (9754881990) & Instagram (@choc.olicious26).">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <span><i class="fa-solid fa-heart" style="color:#E53935;"></i> 100% Eggless Homemade Artisan Chocolates</span>
+    <span class="desktop-only">•</span>
+    <span><i class="fa-brands fa-whatsapp"></i> WhatsApp Order: <strong>+91 97548 81990</strong></span>
+    <span class="desktop-only">•</span>
+    <span><i class="fa-brands fa-instagram"></i> @choc.olicious26</span>
+  </div>
+
+  <!-- Navbar Header -->
+  <nav class="navbar">
+    <div class="container nav-wrapper">
+      <a href="#" class="brand-logo">
+        <div class="logo-icon">C26</div>
+        <div>
+          <span class="brand-name text-gold">Choco.olicious26</span>
+          <span class="brand-tag">Handcrafted Pure Cocoa</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#activities" class="nav-link">Daily Activity Feed</a></li>
+        <li><a href="#products" class="nav-link">Chocolates & Hampers</a></li>
+        <li><a href="#custom-order" class="nav-link">Order Modes</a></li>
+        <li><a href="#reviews" class="nav-link">Reviews</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="btn btn-outline-gold btn-sm" id="admin-trigger-btn" title="Owner Login to post daily updates">
+          <i class="fa-solid fa-user-lock"></i> Owner Panel
+        </button>
+
+        <a href="https://wa.me/919754881990?text=Hi%20Choco.olicious26!%20I%20want%20to%20inquire%20about%20today's%20fresh%20chocolates." target="_blank" class="btn btn-whatsapp btn-sm">
+          <i class="fa-brands fa-whatsapp"></i> Chat on WA
+        </a>
+
+        <button class="cart-trigger" id="cart-open-btn" aria-label="View Shopping Cart">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <div class="badge badge-gold hero-tag">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Pure Belgian & Single-Origin Cocoa
+        </div>
+        <h1 class="hero-title">Experience Pure Bliss with <span class="text-gold">Choco.olicious26</span></h1>
+        <p class="hero-desc">
+          Har roj ki taaza handcrafted chocolates! Truffles, dark bars, aur customized gift hampers jo melt ho jaayein aapke muh mein. Order directly on Website, WhatsApp, or Instagram!
+        </p>
+
+        <div class="hero-buttons">
+          <a href="#products" class="btn btn-gold">
+            <i class="fa-solid fa-cookie"></i> Explore Chocolates
+          </a>
+          <a href="#activities" class="btn btn-outline-gold">
+            <i class="fa-solid fa-camera"></i> Today's Activity Feed
+          </a>
+          <a href="https://www.instagram.com/choc.olicious26/" target="_blank" class="btn btn-insta">
+            <i class="fa-brands fa-instagram"></i> Follow @choc.olicious26
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Fresh & Homemade</div>
+          </div>
+          <div>
+            <div class="stat-number">4.9★</div>
+            <div class="stat-label">Customer Rating</div>
+          </div>
+          <div>
+            <div class="stat-number">Eggless</div>
+            <div class="stat-label">Pure Vegetarian</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Card -->
+      <div class="hero-card-display">
+        <div class="hero-image-wrapper">
+          <img src="https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=800" alt="Choco.olicious26 Artisan Chocolates">
+          <div class="hero-badge-overlay">
+            <div>
+              <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">✨ Today's Fresh Batch</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Hazelnut Rocher & Dark Truffles</div>
+            </div>
+            <a href="https://wa.me/919754881990?text=Hi!%20I%20want%20to%20order%20Today's%20Fresh%20Batch!" target="_blank" class="btn btn-gold btn-sm">
+              Quick Order <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Daily Activity Section ("Daily Choco Diaries") -->
+  <section id="activities" class="section-padding" style="background: var(--bg-surface);">
+    <div class="container">
+      <div class="section-header">
+        <span class="sub-title">Live Daily Updates</span>
+        <h2 class="main-title text-gold">Daily Choco Diaries 📸</h2>
+        <p class="desc">
+          Dekhiye humari daily activity - fresh batch making, packaging, and special daily offers. Owner yahan daily fresh updates post aur manage karti hain!
+        </p>
+      </div>
+
+      <div class="activities-bar">
+        <div class="activity-filters">
+          <button class="filter-btn active" data-filter="all">All Updates</button>
+          <button class="filter-btn" data-filter="Today">Today</button>
+          <button class="filter-btn" data-filter="Yesterday">Yesterday</button>
+        </div>
+
+        <button class="btn btn-gold btn-sm" id="add-activity-btn">
+          <i class="fa-solid fa-sliders"></i> Open Owner Control Panel
+        </button>
+      </div>
+
+      <!-- Activities Container Grid -->
+      <div class="activities-grid" id="activities-container">
+        <!-- Dynamically rendered via app.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Catalog Section -->
+  <section id="products" class="section-padding">
+    <div class="container">
+      <div class="section-header">
+        <span class="sub-title">Made with Premium Ingredients</span>
+        <h2 class="main-title text-gold">Handcrafted Chocolate Menu 🍫</h2>
+        <p class="desc">Select your favorites, customize for your loved ones, and place order directly!</p>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="activities-bar" style="justify-content: center;">
+        <div class="activity-filters">
+          <button class="filter-btn active" data-cat="all">All Menu</button>
+          <button class="filter-btn" data-cat="truffles">Truffles & Bonbons</button>
+          <button class="filter-btn" data-cat="bars">Artisan Bars</button>
+          <button class="filter-btn" data-cat="hampers">Gift Hampers</button>
+          <button class="filter-btn" data-cat="sugarfree">Sugar Free / Keto</button>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="products-container">
+        <!-- Dynamically rendered via app.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 Instant Ordering Modes Banner -->
+  <section id="custom-order" class="container" style="margin-bottom: 80px;">
+    <div class="instant-order-banner">
+      <div>
+        <div class="badge badge-gold" style="margin-bottom: 12px;">Fastest Delivery Assistance</div>
+        <h2 class="text-gold">3 Easy Ways To Place Your Order!</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">
+          Aap apni pasand ke hisab se WhatsApp, Instagram ya direct website se order de sakte hain.
+        </p>
+
+        <div class="order-options-flex">
+          <div class="option-box">
+            <div>
+              <strong style="color: #fff; font-size: 1.05rem;"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> WhatsApp Direct Order</strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">Instant response on <strong>+91 97548 81990</strong> with cart total</div>
+            </div>
+            <a href="https://wa.me/919754881990?text=Hi%20Choco.olicious26!%20I%20want%20to%20order%20chocolates." target="_blank" class="btn btn-whatsapp btn-sm">
+              WhatsApp Now
+            </a>
+          </div>
+
+          <div class="option-box">
+            <div>
+              <strong style="color: #fff; font-size: 1.05rem;"><i class="fa-brands fa-instagram" style="color:#E1306C;"></i> Instagram DM Order</strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">Send photos/custom requests on <strong>@choc.olicious26</strong></div>
+            </div>
+            <a href="https://www.instagram.com/choc.olicious26/" target="_blank" class="btn btn-insta btn-sm">
+              DM on Insta
+            </a>
+          </div>
+
+          <div class="option-box">
+            <div>
+              <strong style="color: #fff; font-size: 1.05rem;"><i class="fa-solid fa-cart-shopping" style="color:var(--primary-gold);"></i> Direct Website Cart</strong>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">Add items to cart & checkout with item breakdown</div>
+            </div>
+            <button class="btn btn-gold btn-sm" onclick="app.openCart()">
+              Open Cart
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <img src="https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&q=80&w=600" alt="Choco.olicious26 Gift Box" style="width: 100%; max-width: 340px; border-radius: var(--radius-md); border: 2px solid var(--primary-gold);">
+      </div>
+    </div>
+  </section>
+
+  <!-- Customer Reviews Section -->
+  <section id="reviews" class="section-padding" style="background: var(--bg-surface);">
+    <div class="container">
+      <div class="section-header">
+        <span class="sub-title">Loved By Chocolate Lovers</span>
+        <h2 class="main-title text-gold">Customer Reviews & Google Feedback ❤️</h2>
+        <p class="desc">Aapka feedback humare liye sabse keemti hai!</p>
+        
+        <div style="margin-top: 20px;">
+          <a href="https://g.page/r/YOUR_GOOGLE_BUSINESS_ID/review" id="google-review-link" target="_blank" class="btn btn-gold btn-sm">
+            <i class="fa-brands fa-google"></i> Write a Google Review
+          </a>
+        </div>
+      </div>
+
+      <!-- Live Widget Placeholder / Customer Reviews Grid -->
+      <div id="google-widget-container" style="margin-bottom: 40px; display: none;">
+        <!-- If owner embeds a live widget, it will render here -->
+      </div>
+
+      <div class="reviews-grid" id="reviews-container">
+        <!-- Dynamically rendered via app.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="brand-logo">
+            <div class="logo-icon">C26</div>
+            <span class="brand-name text-gold">Choco.olicious26</span>
+          </a>
+          <p>Handcrafted homemade chocolates made with 100% pure cocoa and supreme hygiene. Order fresh batches for all special occasions, birthdays, and anniversaries.</p>
+          <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <a href="https://wa.me/919754881990" target="_blank" class="btn btn-whatsapp btn-sm"><i class="fa-brands fa-whatsapp"></i> WA 9754881990</a>
+            <a href="https://www.instagram.com/choc.olicious26/" target="_blank" class="btn btn-insta btn-sm"><i class="fa-brands fa-instagram"></i> @choc.olicious26</a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="#activities">Daily Activity Feed</a></li>
+            <li><a href="#products">Chocolate Catalog</a></li>
+            <li><a href="#custom-order">Order Modes</a></li>
+            <li><a href="#reviews">Customer Reviews</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Contact & Ordering</h4>
+          <ul class="footer-links">
+            <li><i class="fa-solid fa-phone" style="color:var(--primary-gold);"></i> +91 97548 81990</li>
+            <li><i class="fa-brands fa-instagram" style="color:var(--primary-gold);"></i> choc.olicious26</li>
+            <li><i class="fa-solid fa-location-dot" style="color:var(--primary-gold);"></i> India (Fresh Home Dispatch)</li>
+            <li><i class="fa-solid fa-leaf" style="color: #4CAF50;"></i> 100% Vegetarian Eggless</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 <strong>Choco.olicious26</strong>. All Rights Reserved. Made with ❤️ for Chocolate Lovers.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Shopping Cart Drawer -->
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="cart-header">
+      <h3 style="font-size: 1.2rem; font-weight: 700;" class="text-gold"><i class="fa-solid fa-bag-shopping"></i> Your Chocolate Cart</h3>
+      <button class="close-modal" id="cart-close-btn">&times;</button>
+    </div>
+
+    <div class="cart-body" id="cart-items-list">
+      <!-- Rendered by app.js -->
+    </div>
+
+    <div class="cart-footer">
+      <div class="cart-total-row">
+        <span>Total Amount:</span>
+        <span class="text-gold" id="cart-total-price">₹0</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-whatsapp" id="checkout-wa-btn" style="width: 100%;">
+          <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp (Fastest)
+        </button>
+        <button class="btn btn-gold" id="checkout-web-btn" style="width: 100%;">
+          <i class="fa-solid fa-credit-card"></i> Proceed to Website Checkout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Powerful Owner Control Dashboard Modal -->
+  <div class="modal-overlay" id="admin-modal">
+    <div class="modal-content" style="max-width: 680px;">
+      <button class="close-modal" id="admin-close-btn">&times;</button>
+      
+      <div id="admin-login-view">
+        <h3 class="text-gold" style="font-size: 1.5rem; margin-bottom: 10px;"><i class="fa-solid fa-user-shield"></i> Owner Access Portal</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Enter security PIN to access photo uploader, delete posts, and manage settings.</p>
+        
+        <div class="form-group">
+          <label class="form-label">Owner Security PIN (Default: 2026)</label>
+          <input type="password" id="admin-pin-input" class="form-control" placeholder="Enter PIN..." value="2026">
+        </div>
+        <button class="btn btn-gold" id="admin-login-btn" style="width: 100%;">Unlock Owner Dashboard</button>
+      </div>
+
+      <div id="admin-dashboard-view" style="display: none;">
+        <!-- Admin Navigation Tabs -->
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 12px; flex-wrap: wrap;">
+          <button class="filter-btn active" id="tab-post-btn" onclick="app.switchAdminTab('post')">📸 Upload Photo</button>
+          <button class="filter-btn" id="tab-manage-btn" onclick="app.switchAdminTab('manage')">🗑️ Delete Posts</button>
+          <button class="filter-btn" id="tab-reviews-btn" onclick="app.switchAdminTab('reviews')">⭐ Manage Reviews</button>
+          <button class="filter-btn" id="tab-profile-btn" onclick="app.switchAdminTab('profile')">⚙️ Edit Profile</button>
+        </div>
+
+        <!-- Tab 1: Post Daily Activity with File Upload -->
+        <div id="admin-tab-post">
+          <h3 class="text-gold" style="font-size: 1.3rem; margin-bottom: 8px;">📸 Upload Today's Photo & Update</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">
+            Choose a photo from your phone or computer gallery to post on your website daily!
+          </p>
+
+          <form id="activity-post-form">
+            <div class="form-group">
+              <label class="form-label">Activity Title / Headline *</label>
+              <input type="text" id="post-title" class="form-control" placeholder="e.g. ✨ Fresh Hazelnut Rochers Batch Ready!" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Category / Tag</label>
+              <select id="post-tag" class="form-control">
+                <option value="Fresh Batch">Fresh Batch (ताज़ा बैच)</option>
+                <option value="Customer Dispatch">Customer Dispatch (पैकिंग & आर्डर)</option>
+                <option value="Behind The Scenes">Behind The Scenes (चॉकलेट मेकिंग)</option>
+                <option value="Special Offer">Special Offer (खास ऑफर)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">📸 Choose Photo from Phone/PC Gallery *</label>
+              <input type="file" id="post-file-input" class="form-control" accept="image/*" style="padding: 8px;">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 6px 0;">-- OR Paste Image URL below --</div>
+              <input type="url" id="post-image-url" class="form-control" placeholder="https://images.unsplash.com/...">
+              <div id="image-preview-box" style="margin-top: 10px; display: none; text-align: center;">
+                <img id="preview-img-tag" style="max-height: 140px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold);">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Activity Description / Details *</label>
+              <textarea id="post-desc" class="form-control" rows="2" placeholder="Tell customers about today's fresh batch..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width: 100%;">Publish Photo to Website ✨</button>
+          </form>
+        </div>
+
+        <!-- Tab 2: Manage & Delete Activity Posts -->
+        <div id="admin-tab-manage" style="display: none;">
+          <h3 class="text-gold" style="font-size: 1.3rem; margin-bottom: 8px;">🗑️ Delete Active Daily Posts</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">
+            Here are all active posts on your website. Click "Delete Post" to remove any old post instantly!
+          </p>
+
+          <div id="admin-manage-posts-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 380px; overflow-y: auto;">
+            <!-- Rendered via app.js -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Manage Reviews & Live Widget -->
+        <div id="admin-tab-reviews" style="display: none;">
+          <h3 class="text-gold" style="font-size: 1.3rem; margin-bottom: 8px;">⭐ Google Reviews & Widget settings</h3>
+          
+          <div style="background: rgba(212,175,55,0.05); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(212,175,55,0.2); margin-bottom: 16px;">
+            <label class="form-label">🔗 Your Google Business Review URL</label>
+            <input type="url" id="setting-google-review-url" class="form-control" placeholder="https://g.page/r/...">
+            <button class="btn btn-gold btn-sm" onclick="app.saveGoogleReviewUrl()" style="margin-top: 8px; width: 100%;">Save Google Review Link</button>
+          </div>
+
+          <div style="background: rgba(212,175,55,0.05); padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(212,175,55,0.2); margin-bottom: 16px;">
+            <label class="form-label">🌐 Google Reviews Live Widget Code (Elfsight / Trustindex HTML code)</label>
+            <textarea id="setting-widget-code" class="form-control" rows="3" placeholder="Paste your <script>...</script> widget code here for auto updating reviews..."></textarea>
+            <button class="btn btn-gold btn-sm" onclick="app.saveWidgetCode()" style="margin-top: 8px; width: 100%;">Save & Embed Live Widget</button>
+          </div>
+
+          <h4 class="text-gold" style="font-size: 1.1rem; margin-bottom: 8px;">➕ Add a Manual Customer Review</h4>
+          <form id="add-review-form" onsubmit="app.handleManualReview(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <input type="text" id="rev-cust-name" class="form-control" placeholder="Customer Name *" required>
+              </div>
+              <div class="form-group">
+                <input type="text" id="rev-cust-loc" class="form-control" placeholder="Location (e.g. Bhopal) *" required>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <select id="rev-cust-stars" class="form-control">
+                  <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+                  <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-gold btn-sm" style="height: 44px;">Add Review to Site</button>
+            </div>
+            <div class="form-group">
+              <textarea id="rev-cust-comment" class="form-control" rows="2" placeholder="Review details / feedback text..." required></textarea>
+            </div>
+          </form>
+
+          <h4 class="text-gold" style="font-size: 1.1rem; margin: 16px 0 8px;">🗑️ Delete Current Reviews</h4>
+          <div id="admin-manage-reviews-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;">
+            <!-- Rendered via app.js -->
+          </div>
+        </div>
+
+        <!-- Tab 4: Edit Business Profile Settings -->
+        <div id="admin-tab-profile" style="display: none;">
+          <h3 class="text-gold" style="font-size: 1.3rem; margin-bottom: 8px;">⚙️ Edit Business Profile Details</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">
+            Update your WhatsApp number, Instagram handle, or Security PIN.
+          </p>
+
+          <form id="profile-edit-form">
+            <div class="form-group">
+              <label class="form-label">Brand Name</label>
+              <input type="text" id="setting-brand-name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">WhatsApp Number (Without + or spaces)</label>
+              <input type="text" id="setting-whatsapp" class="form-control" placeholder="e.g. 9754881990" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Instagram Handle (Username)</label>
+              <input type="text" id="setting-instagram" class="form-control" placeholder="e.g. choco.olicious26" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tagline / Subtitle</label>
+              <input type="text" id="setting-tagline" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Owner Panel Security PIN</label>
+              <input type="text" id="setting-pin" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width: 100%;">Save Business Profile Details 💾</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Website Checkout Modal -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-content">
+      <button class="close-modal" id="checkout-close-btn">&times;</button>
+      
+      <h3 class="text-gold" style="font-size: 1.5rem; margin-bottom: 10px;"><i class="fa-solid fa-paper-plane"></i> Finalize Your Order</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+        Fill details to complete order via WhatsApp or Direct Confirmation.
+      </p>
+
+      <form id="checkout-form">
+        <div class="form-group">
+          <label class="form-label">Your Name *</label>
+          <input type="text" id="cust-name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mobile / WhatsApp Number *</label>
+          <input type="tel" id="cust-phone" class="form-control" placeholder="e.g. 9876543210" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Delivery Address / City *</label>
+          <textarea id="cust-address" class="form-control" rows="2" placeholder="House no, Street, Landmark, City..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Custom Greeting Message / Customization Note</label>
+          <input type="text" id="cust-note" class="form-control" placeholder="e.g. Please write 'Happy Birthday Neha' on gift box card!">
+        </div>
+
+        <div style="background: rgba(212, 175, 55, 0.1); padding: 14px; border-radius: var(--radius-sm); border: 1px dashed var(--primary-gold); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem;" class="text-gold">
+            <span>Total Payable Amount:</span>
+            <span id="modal-checkout-total">₹0</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <button type="button" id="confirm-wa-submit" class="btn btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> Send on WhatsApp
+          </button>
+          <button type="submit" class="btn btn-gold">
+            <i class="fa-solid fa-check-circle"></i> Confirm Web Order
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
