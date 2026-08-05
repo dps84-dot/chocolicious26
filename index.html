@@ -345,6 +345,7 @@
         <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 12px; flex-wrap: wrap;">
           <button class="filter-btn active" id="tab-post-btn" onclick="app.switchAdminTab('post')">📸 Upload Photo</button>
           <button class="filter-btn" id="tab-video-btn" onclick="app.switchAdminTab('video')">🎥 Upload Video</button>
+          <button class="filter-btn" id="tab-products-btn" onclick="app.switchAdminTab('products')">🍫 Manage Menu</button>
           <button class="filter-btn" id="tab-manage-btn" onclick="app.switchAdminTab('manage')">🗑️ Delete Posts</button>
           <button class="filter-btn" id="tab-reviews-btn" onclick="app.switchAdminTab('reviews')">⭐ Manage Reviews</button>
           <button class="filter-btn" id="tab-profile-btn" onclick="app.switchAdminTab('profile')">⚙️ Edit Profile</button>
@@ -488,6 +489,70 @@
 
           <h4 class="text-gold" style="font-size: 1.1rem; margin: 16px 0 8px;">🗑️ Delete Current Reviews</h4>
           <div id="admin-manage-reviews-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;">
+            <!-- Rendered via app.js -->
+          </div>
+        </div>
+
+        <!-- Tab 3.5: Manage Menu / Products -->
+        <div id="admin-tab-products" style="display: none;">
+          <h3 class="text-gold" style="font-size: 1.3rem; margin-bottom: 8px;">🍫 Add Handcrafted Chocolate / Gift Hamper</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">
+            Add a new product or gift hamper to your website catalog!
+          </p>
+
+          <form id="product-add-form" onsubmit="app.handlePostProduct(event)">
+            <div class="form-group">
+              <label class="form-label">Product/Hamper Name *</label>
+              <input type="text" id="prod-title-input" class="form-control" placeholder="e.g. Signature Dark Almond Pralines" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label class="form-label">Category *</label>
+                <select id="prod-category" class="form-control">
+                  <option value="truffles">Truffles & Bonbons</option>
+                  <option value="bars">Artisan Bars</option>
+                  <option value="hampers">Gift Hampers</option>
+                  <option value="sugarfree">Sugar Free / Keto</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Badge (e.g. Bestseller)</label>
+                <input type="text" id="prod-badge" class="form-control" placeholder="e.g. Pure Cocoa">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label class="form-label">Price (₹) *</label>
+                <input type="number" id="prod-price" class="form-control" placeholder="e.g. 299" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Original Price (for discount)</label>
+                <input type="number" id="prod-original-price" class="form-control" placeholder="e.g. 399">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">📸 Choose Product Image *</label>
+              <input type="file" id="prod-file-input" class="form-control" accept="image/*" style="padding: 8px;" onchange="app.handleProductImageSelect(event)">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 6px 0;">-- OR Paste Image URL below --</div>
+              <input type="url" id="prod-image-url" class="form-control" placeholder="https://...">
+              <div id="prod-preview-box" style="margin-top: 10px; display: none; text-align: center;">
+                <img id="preview-prod-img" style="max-height: 120px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold);">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Product Description *</label>
+              <textarea id="prod-desc" class="form-control" rows="2" placeholder="Tell customers about the flavor, size, count etc..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width: 100%;">Add Product to Menu 🍫</button>
+          </form>
+
+          <h4 class="text-gold" style="font-size: 1.1rem; margin: 20px 0 8px;">🗑️ Delete Current Products</h4>
+          <div id="admin-manage-products-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;">
             <!-- Rendered via app.js -->
           </div>
         </div>

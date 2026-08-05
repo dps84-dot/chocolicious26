@@ -144,6 +144,8 @@ class ChocoApp {
     document.getElementById('tab-post-btn').classList.toggle('active', tab === 'post');
     const videoBtn = document.getElementById('tab-video-btn');
     if (videoBtn) videoBtn.classList.toggle('active', tab === 'video');
+    const productsBtn = document.getElementById('tab-products-btn');
+    if (productsBtn) productsBtn.classList.toggle('active', tab === 'products');
     const manageBtn = document.getElementById('tab-manage-btn');
     if (manageBtn) manageBtn.classList.toggle('active', tab === 'manage');
     const reviewsBtn = document.getElementById('tab-reviews-btn');
@@ -153,6 +155,8 @@ class ChocoApp {
     document.getElementById('admin-tab-post').style.display = tab === 'post' ? 'block' : 'none';
     const videoTab = document.getElementById('admin-tab-video');
     if (videoTab) videoTab.style.display = tab === 'video' ? 'block' : 'none';
+    const productsTab = document.getElementById('admin-tab-products');
+    if (productsTab) productsTab.style.display = tab === 'products' ? 'block' : 'none';
     const manageTab = document.getElementById('admin-tab-manage');
     if (manageTab) manageTab.style.display = tab === 'manage' ? 'block' : 'none';
     const reviewsTab = document.getElementById('admin-tab-reviews');
@@ -161,6 +165,8 @@ class ChocoApp {
 
     if (tab === 'manage') {
       this.renderAdminManagePosts();
+    } else if (tab === 'products') {
+      this.renderAdminManageProducts();
     } else if (tab === 'reviews') {
       this.renderAdminManageReviews();
       const savedGoogleUrl = localStorage.getItem('choco_google_review_url');
@@ -174,6 +180,97 @@ class ChocoApp {
       document.getElementById('setting-tagline').value = CHOCO_CONFIG.tagline;
       document.getElementById('setting-pin').value = CHOCO_CONFIG.adminPin;
     }
+  }
+
+  handleProductImageSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      this.uploadedProductImageBase64 = event.target.result;
+      const previewBox = document.getElementById('prod-preview-box');
+      const previewImg = document.getElementById('preview-prod-img');
+      if (previewImg) previewImg.src = this.uploadedProductImageBase64;
+      if (previewBox) previewBox.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handlePostProduct(e) {
+    e.preventDefault();
+    const title = document.getElementById('prod-title-input').value.trim();
+    const category = document.getElementById('prod-category').value;
+    const badge = document.getElementById('prod-badge').value.trim();
+    const price = parseInt(document.getElementById('prod-price').value);
+    const origPriceVal = document.getElementById('prod-original-price').value;
+    const originalPrice = origPriceVal ? parseInt(origPriceVal) : null;
+    const urlInput = document.getElementById('prod-image-url').value.trim();
+    const desc = document.getElementById('prod-desc').value.trim();
+
+    const finalImage = this.uploadedProductImageBase64 || urlInput || "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&q=80&w=600";
+
+    const newProduct = {
+      id: `prod-${Date.now()}`,
+      name: title,
+      category: category,
+      price: price,
+      originalPrice: originalPrice,
+      rating: 5.0,
+      reviewsCount: 1,
+      badge: badge || null,
+      eggless: true,
+      image: finalImage,
+      description: desc
+    };
+
+    this.products.unshift(newProduct);
+    localStorage.setItem('choco_products', JSON.stringify(this.products));
+
+    this.renderProducts('all');
+    this.renderAdminManageProducts();
+    this.closeAdminModal();
+    this.showToast("🍫 New chocolate added to website menu!");
+
+    // Reset Form
+    document.getElementById('product-add-form').reset();
+    this.uploadedProductImageBase64 = null;
+    const previewBox = document.getElementById('prod-preview-box');
+    if (previewBox) previewBox.style.display = 'none';
+  }
+
+  deleteProduct(prodId) {
+    if (!confirm("Are you sure you want to delete this product from the menu catalog?")) return;
+
+    this.products = this.products.filter(p => p.id !== prodId);
+    localStorage.setItem('choco_products', JSON.stringify(this.products));
+
+    this.renderProducts('all');
+    this.renderAdminManageProducts();
+    this.showToast("🗑️ Product deleted!");
+  }
+
+  renderAdminManageProducts() {
+    const listEl = document.getElementById('admin-manage-products-list');
+    if (!listEl) return;
+
+    if (this.products.length === 0) {
+      listEl.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px;">No products in menu.</p>`;
+      return;
+    }
+
+    listEl.innerHTML = this.products.map(p => `
+      <div style="background: var(--bg-card); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+        <img src="${p.image}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px;">
+        <div style="flex-grow: 1; font-size: 0.9rem;">
+          <div style="font-weight: 600; color: #fff;">${p.name}</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">₹${p.price} | Category: ${p.category}</div>
+        </div>
+        <button class="btn btn-outline-gold btn-sm" style="color: #E53935; border-color: #E53935; padding: 4px 8px; font-size: 0.75rem;" onclick="app.deleteProduct('${p.id}')">
+          Delete
+        </button>
+      </div>
+    `).join('');
   }
 
   handleVideoSelect(e) {
