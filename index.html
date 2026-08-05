@@ -132,6 +132,7 @@
           <button class="filter-btn active" data-filter="all">All Updates</button>
           <button class="filter-btn" data-filter="Today">Today</button>
           <button class="filter-btn" data-filter="Yesterday">Yesterday</button>
+          <button class="filter-btn" data-filter="video">Videos 🎥</button>
         </div>
 
         <button class="btn btn-gold btn-sm" id="add-activity-btn">
@@ -339,12 +340,13 @@
         <!-- Admin Navigation Tabs -->
         <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 12px; flex-wrap: wrap;">
           <button class="filter-btn active" id="tab-post-btn" onclick="app.switchAdminTab('post')">📸 Upload Photo</button>
+          <button class="filter-btn" id="tab-video-btn" onclick="app.switchAdminTab('video')">🎥 Upload Video</button>
           <button class="filter-btn" id="tab-manage-btn" onclick="app.switchAdminTab('manage')">🗑️ Delete Posts</button>
           <button class="filter-btn" id="tab-reviews-btn" onclick="app.switchAdminTab('reviews')">⭐ Manage Reviews</button>
           <button class="filter-btn" id="tab-profile-btn" onclick="app.switchAdminTab('profile')">⚙️ Edit Profile</button>
         </div>
 
-        <!-- Tab 1: Post Daily Activity with File Upload -->
+        <!-- Tab 1: Post Daily Photo -->
         <div id="admin-tab-post">
           <h3 class="text-gold" style="font-size: 1.3rem; margin-bottom: 8px;">📸 Upload Today's Photo & Update</h3>
           <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">
@@ -353,8 +355,8 @@
 
           <form id="activity-post-form">
             <div class="form-group">
-              <label class="form-label">Activity Title / Headline *</label>
-              <input type="text" id="post-title" class="form-control" placeholder="e.g. ✨ Fresh Hazelnut Rochers Batch Ready!" required>
+              <label class="form-label">Photo Title / Headline *</label>
+              <input type="text" id="post-title" class="form-control" placeholder="e.g. ✨ Fresh Chocolates Ready!" required>
             </div>
 
             <div class="form-group">
@@ -368,22 +370,63 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">📸 Choose Photo or Video from Phone/PC Gallery *</label>
-              <input type="file" id="post-file-input" class="form-control" accept="image/*,video/*" style="padding: 8px;">
-              <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 6px 0;">-- OR Paste Image/Video URL below --</div>
+              <label class="form-label">📸 Choose Photo from Phone/PC Gallery *</label>
+              <input type="file" id="post-file-input" class="form-control" accept="image/*" style="padding: 8px;">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 6px 0;">-- OR Paste Image URL below --</div>
               <input type="url" id="post-image-url" class="form-control" placeholder="https://...">
               <div id="image-preview-box" style="margin-top: 10px; display: none; text-align: center;">
                 <img id="preview-img-tag" style="max-height: 140px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold); display: none;">
-                <video id="preview-video-tag" style="max-height: 140px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold); display: none;" controls muted></video>
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Activity Description / Details *</label>
-              <textarea id="post-desc" class="form-control" rows="2" placeholder="Tell customers about today's fresh batch..." required></textarea>
+              <label class="form-label">Photo Description *</label>
+              <textarea id="post-desc" class="form-control" rows="2" placeholder="Tell customers about this photo..." required></textarea>
             </div>
 
             <button type="submit" class="btn btn-gold" style="width: 100%;">Publish Photo to Website ✨</button>
+          </form>
+        </div>
+
+        <!-- Tab 1.5: Post Daily Video -->
+        <div id="admin-tab-video" style="display: none;">
+          <h3 class="text-gold" style="font-size: 1.3rem; margin-bottom: 8px;">🎥 Upload Today's Video Update</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px;">
+            Choose a chocolate tempering, packing, or baking video to show on your website!
+          </p>
+
+          <form id="video-post-form" onsubmit="app.handlePostVideo(event)">
+            <div class="form-group">
+              <label class="form-label">Video Title / Headline *</label>
+              <input type="text" id="video-title" class="form-control" placeholder="e.g. 🍫 Behind The Scenes Chocolate Making!" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Select Category / Tag</label>
+              <select id="video-tag" class="form-control">
+                <option value="Behind The Scenes">Behind The Scenes (चॉकलेट मेकिंग)</option>
+                <option value="Fresh Batch">Fresh Batch (ताज़ा बैच)</option>
+                <option value="Customer Dispatch">Customer Dispatch (पैकिंग & आर्डर)</option>
+                <option value="Special Offer">Special Offer (खास ऑफर)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">🎥 Choose Video from Phone/PC Gallery *</label>
+              <input type="file" id="video-file-input" class="form-control" accept="video/*" style="padding: 8px;" onchange="app.handleVideoSelect(event)">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 6px 0;">-- OR Paste Video Link below --</div>
+              <input type="url" id="video-url-input" class="form-control" placeholder="https://...">
+              <div id="video-preview-box" style="margin-top: 10px; display: none; text-align: center;">
+                <video id="preview-video-tag-2" style="max-height: 140px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold);" controls muted></video>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Video Description *</label>
+              <textarea id="video-desc" class="form-control" rows="2" placeholder="Tell customers about this video..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-gold" style="width: 100%;">Publish Video to Website 🎥</button>
           </form>
         </div>
 

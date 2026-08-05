@@ -144,6 +144,8 @@ class ChocoApp {
 
   switchAdminTab(tab) {
     document.getElementById('tab-post-btn').classList.toggle('active', tab === 'post');
+    const videoBtn = document.getElementById('tab-video-btn');
+    if (videoBtn) videoBtn.classList.toggle('active', tab === 'video');
     const manageBtn = document.getElementById('tab-manage-btn');
     if (manageBtn) manageBtn.classList.toggle('active', tab === 'manage');
     const reviewsBtn = document.getElementById('tab-reviews-btn');
@@ -151,6 +153,8 @@ class ChocoApp {
     document.getElementById('tab-profile-btn').classList.toggle('active', tab === 'profile');
 
     document.getElementById('admin-tab-post').style.display = tab === 'post' ? 'block' : 'none';
+    const videoTab = document.getElementById('admin-tab-video');
+    if (videoTab) videoTab.style.display = tab === 'video' ? 'block' : 'none';
     const manageTab = document.getElementById('admin-tab-manage');
     if (manageTab) manageTab.style.display = tab === 'manage' ? 'block' : 'none';
     const reviewsTab = document.getElementById('admin-tab-reviews');
@@ -172,6 +176,62 @@ class ChocoApp {
       document.getElementById('setting-tagline').value = CHOCO_CONFIG.tagline;
       document.getElementById('setting-pin').value = CHOCO_CONFIG.adminPin;
     }
+  }
+
+  handleVideoSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      this.uploadedVideoBase64 = event.target.result;
+      const previewBox = document.getElementById('video-preview-box');
+      const previewVid = document.getElementById('preview-video-tag-2');
+      if (previewVid) {
+        previewVid.src = this.uploadedVideoBase64;
+      }
+      if (previewBox) previewBox.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  handlePostVideo(e) {
+    e.preventDefault();
+    const title = document.getElementById('video-title').value.trim();
+    const tag = document.getElementById('video-tag').value;
+    const urlInput = document.getElementById('video-url-input').value.trim();
+    const desc = document.getElementById('video-desc').value.trim();
+
+    const finalVideo = this.uploadedVideoBase64 || urlInput;
+    if (!finalVideo) {
+      alert("Please select a video file or paste a video link!");
+      return;
+    }
+
+    const newActivity = {
+      id: `act-${Date.now()}`,
+      date: 'Today',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      title: title,
+      description: desc,
+      image: finalVideo,
+      tag: tag,
+      likes: 1,
+      isVideo: true
+    };
+
+    this.activities.unshift(newActivity);
+    localStorage.setItem('choco_activities', JSON.stringify(this.activities));
+
+    this.renderActivities('all');
+    this.closeAdminModal();
+    this.showToast("🎥 Video update published successfully!");
+
+    // Reset Form
+    document.getElementById('video-post-form').reset();
+    this.uploadedVideoBase64 = null;
+    const previewBox = document.getElementById('video-preview-box');
+    if (previewBox) previewBox.style.display = 'none';
   }
 
   saveGoogleReviewUrl() {
@@ -315,7 +375,9 @@ class ChocoApp {
     const container = document.getElementById('activities-container');
     let filtered = this.activities;
 
-    if (filter !== 'all') {
+    if (filter === 'video') {
+      filtered = this.activities.filter(a => a.isVideo);
+    } else if (filter !== 'all') {
       filtered = this.activities.filter(a => a.date.toLowerCase() === filter.toLowerCase());
     }
 
