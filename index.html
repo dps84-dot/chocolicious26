@@ -34,11 +34,12 @@
         </div>
       </a>
 
-      <ul class="nav-links">
-        <li><a href="#activities" class="nav-link">Daily Activity Feed</a></li>
-        <li><a href="#products" class="nav-link">Chocolates & Hampers</a></li>
-        <li><a href="#custom-order" class="nav-link">Order Modes</a></li>
-        <li><a href="#reviews" class="nav-link">Reviews</a></li>
+      <!-- Navigation Links -->
+      <ul class="nav-links" id="nav-links-menu">
+        <li><a href="#activities" class="nav-link" onclick="app.toggleMobileMenu()">Daily Activity Feed</a></li>
+        <li><a href="#products" class="nav-link" onclick="app.toggleMobileMenu()">Chocolates & Hampers</a></li>
+        <li><a href="#custom-order" class="nav-link" onclick="app.toggleMobileMenu()">Order Modes</a></li>
+        <li><a href="#reviews" class="nav-link" onclick="app.toggleMobileMenu()">Reviews</a></li>
       </ul>
 
       <div class="nav-actions">
@@ -53,6 +54,11 @@
         <button class="cart-trigger" id="cart-open-btn" aria-label="View Shopping Cart">
           <i class="fa-solid fa-bag-shopping"></i>
           <span class="cart-count" id="cart-count">0</span>
+        </button>
+
+        <!-- Responsive Hamburger Trigger -->
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle Navigation Menu" onclick="app.toggleMobileMenu()" style="display: none;">
+          <i class="fa-solid fa-bars"></i>
         </button>
       </div>
     </div>

@@ -109,6 +109,13 @@ class ChocoApp {
     document.getElementById('checkout-form').addEventListener('submit', (e) => this.processWebOrder(e));
   }
 
+  toggleMobileMenu() {
+    const menu = document.getElementById('nav-links-menu');
+    if (menu) {
+      menu.classList.toggle('active');
+    }
+  }
+
   handleFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
