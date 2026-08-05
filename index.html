@@ -368,12 +368,13 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">📸 Choose Photo from Phone/PC Gallery *</label>
-              <input type="file" id="post-file-input" class="form-control" accept="image/*" style="padding: 8px;">
-              <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 6px 0;">-- OR Paste Image URL below --</div>
-              <input type="url" id="post-image-url" class="form-control" placeholder="https://images.unsplash.com/...">
+              <label class="form-label">📸 Choose Photo or Video from Phone/PC Gallery *</label>
+              <input type="file" id="post-file-input" class="form-control" accept="image/*,video/*" style="padding: 8px;">
+              <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 6px 0;">-- OR Paste Image/Video URL below --</div>
+              <input type="url" id="post-image-url" class="form-control" placeholder="https://...">
               <div id="image-preview-box" style="margin-top: 10px; display: none; text-align: center;">
-                <img id="preview-img-tag" style="max-height: 140px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold);">
+                <img id="preview-img-tag" style="max-height: 140px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold); display: none;">
+                <video id="preview-video-tag" style="max-height: 140px; border-radius: var(--radius-sm); border: 1px solid var(--primary-gold); display: none;" controls muted></video>
               </div>
             </div>
 

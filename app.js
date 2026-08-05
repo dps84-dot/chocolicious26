@@ -118,10 +118,26 @@ class ChocoApp {
     const reader = new FileReader();
     reader.onload = (event) => {
       this.uploadedImageBase64 = event.target.result;
+      this.uploadedFileType = file.type.startsWith('video/') ? 'video' : 'image';
+      
       const previewBox = document.getElementById('image-preview-box');
       const previewImg = document.getElementById('preview-img-tag');
-      previewImg.src = this.uploadedImageBase64;
-      previewBox.style.display = 'block';
+      const previewVid = document.getElementById('preview-video-tag');
+      
+      if (this.uploadedFileType === 'video') {
+        if (previewImg) previewImg.style.display = 'none';
+        if (previewVid) {
+          previewVid.src = this.uploadedImageBase64;
+          previewVid.style.display = 'inline-block';
+        }
+      } else {
+        if (previewVid) previewVid.style.display = 'none';
+        if (previewImg) {
+          previewImg.src = this.uploadedImageBase64;
+          previewImg.style.display = 'inline-block';
+        }
+      }
+      if (previewBox) previewBox.style.display = 'block';
     };
     reader.readAsDataURL(file);
   }
@@ -241,18 +257,24 @@ class ChocoApp {
       return;
     }
 
-    listEl.innerHTML = this.activities.map(act => `
-      <div style="background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-        <img src="${act.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
-        <div style="flex-grow: 1;">
-          <div style="font-weight: 600; font-size: 0.95rem; color: #fff;">${act.title}</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${act.date} • ${act.time} | ${act.tag}</div>
+    listEl.innerHTML = this.activities.map(act => {
+      const thumbHtml = act.isVideo
+        ? `<video src="${act.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" muted></video>`
+        : `<img src="${act.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">`;
+
+      return `
+        <div style="background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+          ${thumbHtml}
+          <div style="flex-grow: 1;">
+            <div style="font-weight: 600; font-size: 0.95rem; color: #fff;">${act.title} ${act.isVideo ? '🎥' : '📸'}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${act.date} • ${act.time} | ${act.tag}</div>
+          </div>
+          <button class="btn btn-outline-gold btn-sm" style="color: #E53935; border-color: #E53935; padding: 6px 12px;" onclick="app.deleteActivity('${act.id}')">
+            <i class="fa-solid fa-trash-can"></i> Delete Post
+          </button>
         </div>
-        <button class="btn btn-outline-gold btn-sm" style="color: #E53935; border-color: #E53935; padding: 6px 12px;" onclick="app.deleteActivity('${act.id}')">
-          <i class="fa-solid fa-trash-can"></i> Delete Post
-        </button>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   deleteActivity(actId) {
@@ -307,27 +329,33 @@ class ChocoApp {
       return;
     }
 
-    container.innerHTML = filtered.map(act => `
-      <div class="activity-card">
-        <div class="activity-img-wrapper">
-          <img src="${act.image}" alt="${act.title}" loading="lazy">
-          <span class="activity-time-tag"><i class="fa-regular fa-clock"></i> ${act.date} • ${act.time}</span>
-        </div>
-        <div class="activity-content">
-          <div class="badge badge-gold" style="margin-bottom: 8px;">${act.tag || 'Daily Update'}</div>
-          <h3 class="activity-title">${act.title}</h3>
-          <p class="activity-desc">${act.description}</p>
-          <div class="activity-footer">
-            <button class="like-btn" onclick="app.toggleLike('${act.id}', this)">
-              <i class="fa-solid fa-heart"></i> <span class="like-count">${act.likes || 12}</span> Likes
-            </button>
-            <a href="https://wa.me/${CHOCO_CONFIG.whatsappNumber}?text=Hi!%20I%20saw%20your%20daily%20activity%20'${encodeURIComponent(act.title)}'%20and%20want%20to%20order." target="_blank" class="btn btn-whatsapp btn-sm" style="font-size: 0.75rem; padding: 4px 10px;">
-              <i class="fa-brands fa-whatsapp"></i> Inquire
-            </a>
+    container.innerHTML = filtered.map(act => {
+      const mediaHtml = act.isVideo 
+        ? `<video src="${act.image}" controls loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>`
+        : `<img src="${act.image}" alt="${act.title}" loading="lazy">`;
+
+      return `
+        <div class="activity-card">
+          <div class="activity-img-wrapper">
+            ${mediaHtml}
+            <span class="activity-time-tag"><i class="fa-regular fa-clock"></i> ${act.date} • ${act.time}</span>
+          </div>
+          <div class="activity-content">
+            <div class="badge badge-gold" style="margin-bottom: 8px;">${act.tag || 'Daily Update'}</div>
+            <h3 class="activity-title">${act.title}</h3>
+            <p class="activity-desc">${act.description}</p>
+            <div class="activity-footer">
+              <button class="like-btn" onclick="app.toggleLike('${act.id}', this)">
+                <i class="fa-solid fa-heart"></i> <span class="like-count">${act.likes || 12}</span> Likes
+              </button>
+              <a href="https://wa.me/${CHOCO_CONFIG.whatsappNumber}?text=Hi!%20I%20saw%20your%20daily%20activity%20'${encodeURIComponent(act.title)}'%20and%20want%20to%20order." target="_blank" class="btn btn-whatsapp btn-sm" style="font-size: 0.75rem; padding: 4px 10px;">
+                <i class="fa-brands fa-whatsapp"></i> Inquire
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   renderProducts(category = 'all') {
@@ -603,6 +631,11 @@ class ChocoApp {
     const urlInput = document.getElementById('post-image-url').value.trim();
     const desc = document.getElementById('post-desc').value.trim();
 
+    const isVid = this.uploadedFileType === 'video' || 
+                  urlInput.toLowerCase().endsWith('.mp4') || 
+                  urlInput.toLowerCase().includes('/video') || 
+                  urlInput.toLowerCase().includes('.webm');
+
     const finalImage = this.uploadedImageBase64 || urlInput || "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=600";
 
     const newActivity = {
@@ -613,7 +646,8 @@ class ChocoApp {
       description: desc,
       image: finalImage,
       tag: tag,
-      likes: 1
+      likes: 1,
+      isVideo: isVid
     };
 
     this.activities.unshift(newActivity);
@@ -621,11 +655,17 @@ class ChocoApp {
 
     this.renderActivities('all');
     this.closeAdminModal();
-    this.showToast("✨ Today's photo & activity published to website!");
+    this.showToast("✨ Today's update published successfully to website!");
     
     // Reset form & state
     document.getElementById('activity-post-form').reset();
     this.uploadedImageBase64 = null;
+    this.uploadedFileType = null;
+    
+    const previewImg = document.getElementById('preview-img-tag');
+    if (previewImg) previewImg.style.display = 'none';
+    const previewVid = document.getElementById('preview-video-tag');
+    if (previewVid) previewVid.style.display = 'none';
     const previewBox = document.getElementById('image-preview-box');
     if (previewBox) previewBox.style.display = 'none';
   }
