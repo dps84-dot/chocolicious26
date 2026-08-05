@@ -37,11 +37,9 @@ class ChocoApp {
   }
 
   loadGoogleSettings() {
-    const savedGoogleUrl = localStorage.getItem('choco_google_review_url');
-    if (savedGoogleUrl) {
-      const linkEl = document.getElementById('google-review-link');
-      if (linkEl) linkEl.href = savedGoogleUrl;
-    }
+    const savedGoogleUrl = localStorage.getItem('choco_google_review_url') || 'https://maps.app.goo.gl/YuAXhBZ1VK6Ss52B8';
+    const linkEl = document.getElementById('google-review-link');
+    if (linkEl) linkEl.href = savedGoogleUrl;
 
     const savedWidgetCode = localStorage.getItem('choco_widget_code');
     const container = document.getElementById('google-widget-container');
