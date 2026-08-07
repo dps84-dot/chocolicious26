@@ -155,3 +155,63 @@ const INITIAL_REVIEWS = [
     verified: true
   }
 ];
+
+const INITIAL_SHOWCASE_CATEGORIES = [
+  // Cake Categories
+  { id: "birthday-cakes", group: "Cakes", name: "Birthday Cakes" },
+  { id: "anniversary-cakes", group: "Cakes", name: "Anniversary Cakes" },
+  { id: "wedding-cakes", group: "Cakes", name: "Wedding Cakes" },
+  { id: "theme-cakes", group: "Cakes", name: "Theme Cakes" },
+  { id: "kids-cakes", group: "Cakes", name: "Kids Cakes" },
+  { id: "photo-cakes", group: "Cakes", name: "Photo Cakes" },
+  { id: "chocolate-cakes", group: "Cakes", name: "Chocolate Cakes" },
+  { id: "eggless-cakes", group: "Cakes", name: "Eggless Cakes" },
+  // Chocolate Boutique Categories
+  { id: "gulkand-chocolates", group: "Boutique Chocolates", name: "Gulkand Chocolates" },
+  { id: "dry-fruit-chocolates", group: "Boutique Chocolates", name: "Dry Fruit Chocolates" },
+  { id: "almond-chocolates", group: "Boutique Chocolates", name: "Almond Chocolates" },
+  { id: "cashew-chocolates", group: "Boutique Chocolates", name: "Cashew Chocolates" },
+  { id: "pistachio-chocolates", group: "Boutique Chocolates", name: "Pistachio Chocolates" },
+  { id: "tutti-frutti-chocolates", group: "Boutique Chocolates", name: "Tutti Frutti Chocolates" },
+  { id: "truffle-chocolates", group: "Boutique Chocolates", name: "Truffle Chocolates" },
+  { id: "gift-boxes", group: "Boutique Chocolates", name: "Customized Gift Boxes" }
+];
+
+const INITIAL_SHOWCASE_GALLERY = [
+  {
+    id: "showcase-1",
+    title: "🍰 Two-Tier Princess Birthday Cake",
+    category: "kids-cakes",
+    description: "A gorgeous pink designer princess birthday cake with handcrafted crown topper.",
+    image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=600",
+    isVideo: false,
+    date: "Today"
+  },
+  {
+    id: "showcase-2",
+    title: "🍫 Royal Gulkand Chocolate Bites",
+    category: "gulkand-chocolates",
+    description: "Rich white chocolate cups filled with pure organic sweet gulkand.",
+    image: "https://images.unsplash.com/photo-1548907040-4d42b52125ea?auto=format&fit=crop&q=80&w=600",
+    isVideo: false,
+    date: "Today"
+  },
+  {
+    id: "showcase-3",
+    title: "🎂 Gold Pearl Anniversary Cake",
+    category: "anniversary-cakes",
+    description: "Moist chocolate truffle cake decorated with gold dust and edible pearls.",
+    image: "https://images.unsplash.com/photo-1535141192574-5d4897c13636?auto=format&fit=crop&q=80&w=600",
+    isVideo: false,
+    date: "Yesterday"
+  },
+  {
+    id: "showcase-4",
+    title: "🎁 Premium Wedding Gift Hamper",
+    category: "gift-boxes",
+    description: "A premium luxury wooden hamper containing an assortment of nuts and dry fruit chocolates.",
+    image: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&q=80&w=600",
+    isVideo: false,
+    date: "Yesterday"
+  }
+];

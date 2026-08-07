@@ -6,6 +6,10 @@ class ChocoApp {
     this.activities = JSON.parse(localStorage.getItem('choco_activities')) || INITIAL_ACTIVITIES;
     this.products = JSON.parse(localStorage.getItem('choco_products')) || INITIAL_PRODUCTS;
     this.reviews = JSON.parse(localStorage.getItem('choco_reviews')) || INITIAL_REVIEWS;
+
+    // Load showcase gallery data
+    this.showcaseItems = JSON.parse(localStorage.getItem('choco_showcase')) || INITIAL_SHOWCASE_GALLERY;
+
     this.isAdminUnlocked = sessionStorage.getItem('choco_admin_unlocked') === 'true';
 
     // Load dynamic config overrides if saved
@@ -15,6 +19,7 @@ class ChocoApp {
     }
 
     this.uploadedImageBase64 = null;
+    this.uploadedShowcaseBase64 = null;
     this.init();
   }
 
@@ -24,6 +29,7 @@ class ChocoApp {
     this.loadGoogleSettings();
     this.renderActivities('all');
     this.renderProducts('all');
+    this.renderShowcase('all');
     this.renderReviews();
     this.updateCartCount();
 
@@ -153,6 +159,8 @@ class ChocoApp {
     if (videoBtn) videoBtn.classList.toggle('active', tab === 'video');
     const productsBtn = document.getElementById('tab-products-btn');
     if (productsBtn) productsBtn.classList.toggle('active', tab === 'products');
+    const showcaseBtn = document.getElementById('tab-showcase-btn');
+    if (showcaseBtn) showcaseBtn.classList.toggle('active', tab === 'showcase');
     const manageBtn = document.getElementById('tab-manage-btn');
     if (manageBtn) manageBtn.classList.toggle('active', tab === 'manage');
     const reviewsBtn = document.getElementById('tab-reviews-btn');
@@ -164,6 +172,8 @@ class ChocoApp {
     if (videoTab) videoTab.style.display = tab === 'video' ? 'block' : 'none';
     const productsTab = document.getElementById('admin-tab-products');
     if (productsTab) productsTab.style.display = tab === 'products' ? 'block' : 'none';
+    const showcaseTab = document.getElementById('admin-tab-showcase');
+    if (showcaseTab) showcaseTab.style.display = tab === 'showcase' ? 'block' : 'none';
     const manageTab = document.getElementById('admin-tab-manage');
     if (manageTab) manageTab.style.display = tab === 'manage' ? 'block' : 'none';
     const reviewsTab = document.getElementById('admin-tab-reviews');
@@ -174,6 +184,8 @@ class ChocoApp {
       this.renderAdminManagePosts();
     } else if (tab === 'products') {
       this.renderAdminManageProducts();
+    } else if (tab === 'showcase') {
+      this.renderAdminShowcaseList();
     } else if (tab === 'reviews') {
       this.renderAdminManageReviews();
       const savedGoogleUrl = localStorage.getItem('choco_google_review_url');
@@ -858,6 +870,342 @@ class ChocoApp {
     toast.innerText = msg;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 2500);
+  }
+
+  // --- SHOWCASE GALLERY RENDERING ---
+
+  handleShowcaseFilterChange(e) {
+    this.renderShowcase(e.target.value);
+  }
+
+  renderShowcase(filter = 'all') {
+    const container = document.getElementById('showcase-container');
+    if (!container) return;
+
+    let filtered = this.showcaseItems;
+    if (filter !== 'all') {
+      filtered = this.showcaseItems.filter(item => item.category === filter);
+    }
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
+          <i class="fa-solid fa-images" style="font-size: 2.5rem; color: var(--primary-gold); margin-bottom: 12px;"></i>
+          <p>No images or videos in this category yet. Check back soon!</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filtered.map(item => {
+      // Find category name
+      const catObj = INITIAL_SHOWCASE_CATEGORIES.find(c => c.id === item.category);
+      const catName = catObj ? catObj.name : "Custom Design";
+      const catGroup = catObj ? catObj.group : "Showcase";
+
+      const mediaHtml = item.isVideo
+        ? `<video src="${item.image}" controls loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>`
+        : `<img src="${item.image}" alt="${item.title}" loading="lazy">`;
+
+      return `
+        <div class="product-card" style="border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;">
+          <div class="product-thumb" style="height: 220px; position: relative;">
+            ${mediaHtml}
+            <span class="badge badge-gold" style="position: absolute; top: 12px; left: 12px; font-size: 0.75rem;">${catName}</span>
+            <span class="badge" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); color: #fff; font-size: 0.7rem;">${catGroup}</span>
+          </div>
+          <div class="product-info" style="padding: 18px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <h3 class="product-title" style="font-size: 1.15rem; color: #fff; margin-bottom: 6px;">${item.title}</h3>
+              <p class="product-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">${item.description}</p>
+            </div>
+            
+            <a href="https://wa.me/${CHOCO_CONFIG.whatsappNumber}?text=Hi!%20I%20saw%20your%20showcase%20post%20'${encodeURIComponent(item.title)}'%20and%20want%20to%20inquire%20about%20it." target="_blank" class="btn btn-whatsapp btn-sm" style="width: 100%; text-align: center; justify-content: center;">
+              <i class="fa-brands fa-whatsapp"></i> Inquire on WhatsApp
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // --- SHOWCASE GALLERY ADMIN METHODS ---
+
+  handleShowcaseMediaTypeChange() {
+    this.clearShowcaseImage();
+  }
+
+  handleShowcaseFileSelect(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Error: File exceeds the maximum size limit of 5 MB!");
+      e.target.value = '';
+      return;
+    }
+
+    const typeSelect = document.getElementById('showcase-media-type').value;
+    const isVideoFile = file.type.startsWith('video/');
+
+    if (typeSelect === 'video' && !isVideoFile) {
+      alert("Please select a video file!");
+      e.target.value = '';
+      return;
+    } else if (typeSelect === 'image' && isVideoFile) {
+      alert("Please select an image file!");
+      e.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      this.uploadedShowcaseBase64 = event.target.result;
+      const previewImg = document.getElementById('preview-showcase-img');
+      const previewVid = document.getElementById('preview-showcase-video');
+      const previewBox = document.getElementById('showcase-preview-box');
+
+      if (typeSelect === 'video') {
+        if (previewImg) previewImg.style.display = 'none';
+        if (previewVid) {
+          previewVid.src = this.uploadedShowcaseBase64;
+          previewVid.style.display = 'inline-block';
+        }
+      } else {
+        if (previewVid) previewVid.style.display = 'none';
+        if (previewImg) {
+          previewImg.src = this.uploadedShowcaseBase64;
+          previewImg.style.display = 'inline-block';
+        }
+      }
+      if (previewBox) previewBox.style.display = 'block';
+      document.getElementById('showcase-clear-img-btn').style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  clearShowcaseImage() {
+    this.uploadedShowcaseBase64 = null;
+    document.getElementById('showcase-file-input').value = '';
+    document.getElementById('showcase-url-input').value = '';
+    document.getElementById('showcase-preview-box').style.display = 'none';
+    document.getElementById('showcase-clear-img-btn').style.display = 'none';
+  }
+
+  previewShowcaseUrl() {
+    const url = document.getElementById('showcase-url-input').value.trim();
+    const typeSelect = document.getElementById('showcase-media-type').value;
+    const previewImg = document.getElementById('preview-showcase-img');
+    const previewVid = document.getElementById('preview-showcase-video');
+    const previewBox = document.getElementById('showcase-preview-box');
+
+    if (!url) {
+      if (previewBox) previewBox.style.display = 'none';
+      return;
+    }
+
+    if (typeSelect === 'video') {
+      if (previewImg) previewImg.style.display = 'none';
+      if (previewVid) {
+        previewVid.src = url;
+        previewVid.style.display = 'inline-block';
+      }
+    } else {
+      if (previewVid) previewVid.style.display = 'none';
+      if (previewImg) {
+        previewImg.src = url;
+        previewImg.style.display = 'inline-block';
+      }
+    }
+    if (previewBox) previewBox.style.display = 'block';
+    document.getElementById('showcase-clear-img-btn').style.display = 'inline-block';
+  }
+
+  handlePostShowcase(e) {
+    e.preventDefault();
+    const editId = document.getElementById('showcase-edit-id').value;
+    const title = document.getElementById('showcase-title-input').value.trim();
+    const category = document.getElementById('showcase-category-input').value;
+    const mediaType = document.getElementById('showcase-media-type').value;
+    const urlInput = document.getElementById('showcase-url-input').value.trim();
+    const desc = document.getElementById('showcase-desc-input').value.trim();
+
+    const finalMedia = this.uploadedShowcaseBase64 || urlInput;
+    if (!finalMedia) {
+      alert("Please upload a file or paste a media URL!");
+      return;
+    }
+
+    if (editId) {
+      // Edit mode
+      const index = this.showcaseItems.findIndex(i => i.id === editId);
+      if (index !== -1) {
+        this.showcaseItems[index] = {
+          ...this.showcaseItems[index],
+          title: title,
+          category: category,
+          image: finalMedia,
+          isVideo: mediaType === 'video',
+          description: desc
+        };
+        this.showToast("✏️ Showcase item updated successfully!");
+      }
+    } else {
+      // Create mode
+      const newItem = {
+        id: `showcase-${Date.now()}`,
+        title: title,
+        category: category,
+        image: finalMedia,
+        isVideo: mediaType === 'video',
+        description: desc,
+        date: "Today"
+      };
+      this.showcaseItems.unshift(newItem);
+      this.showToast("✨ New Showcase item published successfully!");
+    }
+
+    localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+    this.cancelShowcaseEdit();
+    this.renderShowcase('all');
+    this.renderAdminShowcaseList();
+  }
+
+  editShowcaseItem(id) {
+    const item = this.showcaseItems.find(i => i.id === id);
+    if (!item) return;
+
+    document.getElementById('showcase-edit-id').value = item.id;
+    document.getElementById('showcase-title-input').value = item.title;
+    document.getElementById('showcase-category-input').value = item.category;
+    document.getElementById('showcase-media-type').value = item.isVideo ? 'video' : 'image';
+    document.getElementById('showcase-desc-input').value = item.description;
+
+    if (item.image.startsWith('data:')) {
+      this.uploadedShowcaseBase64 = item.image;
+      document.getElementById('showcase-url-input').value = '';
+    } else {
+      this.uploadedShowcaseBase64 = null;
+      document.getElementById('showcase-url-input').value = item.image;
+    }
+
+    const previewImg = document.getElementById('preview-showcase-img');
+    const previewVid = document.getElementById('preview-showcase-video');
+    const previewBox = document.getElementById('showcase-preview-box');
+
+    if (item.isVideo) {
+      if (previewImg) previewImg.style.display = 'none';
+      if (previewVid) {
+        previewVid.src = item.image;
+        previewVid.style.display = 'inline-block';
+      }
+    } else {
+      if (previewVid) previewVid.style.display = 'none';
+      if (previewImg) {
+        previewImg.src = item.image;
+        previewImg.style.display = 'inline-block';
+      }
+    }
+    if (previewBox) previewBox.style.display = 'block';
+    document.getElementById('showcase-clear-img-btn').style.display = 'inline-block';
+
+    document.getElementById('showcase-form-title').innerText = "✏️ Edit Showcase Item";
+    document.getElementById('showcase-cancel-btn').style.display = 'inline-block';
+
+    // Scroll form into view inside dashboard modal
+    document.getElementById('showcase-add-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  deleteShowcaseItem(id) {
+    if (!confirm("Are you sure you want to delete this showcase item?")) return;
+
+    this.showcaseItems = this.showcaseItems.filter(i => i.id !== id);
+    localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+
+    this.renderShowcase('all');
+    this.renderAdminShowcaseList();
+    this.showToast("🗑️ Showcase item deleted!");
+  }
+
+  reorderShowcaseItem(id, direction) {
+    const index = this.showcaseItems.findIndex(i => i.id === id);
+    if (index === -1) return;
+
+    if (direction === 'up' && index > 0) {
+      const temp = this.showcaseItems[index];
+      this.showcaseItems[index] = this.showcaseItems[index - 1];
+      this.showcaseItems[index - 1] = temp;
+    } else if (direction === 'down' && index < this.showcaseItems.length - 1) {
+      const temp = this.showcaseItems[index];
+      this.showcaseItems[index] = this.showcaseItems[index + 1];
+      this.showcaseItems[index + 1] = temp;
+    }
+
+    localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+    this.renderShowcase('all');
+    this.renderAdminShowcaseList();
+  }
+
+  cancelShowcaseEdit() {
+    document.getElementById('showcase-edit-id').value = '';
+    document.getElementById('showcase-add-form').reset();
+    this.clearShowcaseImage();
+    document.getElementById('showcase-form-title').innerText = "➕ Add Media to Showcase";
+    document.getElementById('showcase-cancel-btn').style.display = 'none';
+  }
+
+  renderAdminShowcaseList() {
+    const listEl = document.getElementById('admin-showcase-list');
+    if (!listEl) return;
+
+    const query = document.getElementById('showcase-search').value.toLowerCase().trim();
+    const filterCat = document.getElementById('showcase-filter-cat-admin').value;
+
+    let filtered = [...this.showcaseItems];
+
+    // Filter by Category
+    if (filterCat !== 'all') {
+      filtered = filtered.filter(i => i.category === filterCat);
+    }
+
+    // Filter by Search Query
+    if (query) {
+      filtered = filtered.filter(i => i.title.toLowerCase().includes(query) || i.description.toLowerCase().includes(query));
+    }
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px;">No showcase items match this filter.</p>`;
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(item => {
+      const mediaThumb = item.isVideo
+        ? `<video src="${item.image}" style="width: 46px; height: 46px; object-fit: cover; border-radius: 6px;" muted></video>`
+        : `<img src="${item.image}" style="width: 46px; height: 46px; object-fit: cover; border-radius: 6px;">`;
+
+      // Get readable category name
+      const catObj = INITIAL_SHOWCASE_CATEGORIES.find(c => c.id === item.category);
+      const catName = catObj ? catObj.name : "Custom";
+
+      return `
+        <div style="background: var(--bg-card); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-grow: 1; min-width: 200px;">
+            ${mediaThumb}
+            <div>
+              <div style="font-weight: 600; color: #fff; font-size: 0.9rem;">${item.title} ${item.isVideo ? '🎥' : '📸'}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${catName} | ${item.date}</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button class="btn btn-outline-gold btn-sm" onclick="app.reorderShowcaseItem('${item.id}', 'up')" style="padding: 4px 8px; font-size: 0.75rem;" title="Move Up">▲</button>
+            <button class="btn btn-outline-gold btn-sm" onclick="app.reorderShowcaseItem('${item.id}', 'down')" style="padding: 4px 8px; font-size: 0.75rem;" title="Move Down">▼</button>
+            <button class="btn btn-outline-gold btn-sm" onclick="app.editShowcaseItem('${item.id}')" style="padding: 4px 8px; font-size: 0.75rem;">Edit</button>
+            <button class="btn btn-outline-gold btn-sm" onclick="app.deleteShowcaseItem('${item.id}')" style="padding: 4px 8px; font-size: 0.75rem; color: #E53935; border-color: #E53935;">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 }
 
