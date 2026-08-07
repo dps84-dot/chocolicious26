@@ -795,8 +795,9 @@ class ChocoApp {
       sessionStorage.setItem('choco_admin_unlocked', 'true');
       document.getElementById('admin-login-view').style.display = 'none';
       document.getElementById('admin-dashboard-view').style.display = 'block';
+      this.showToast("🔓 Owner Dashboard Unlocked!");
     } else {
-      alert("Incorrect Owner Security PIN! Default PIN is 2026.");
+      alert("Incorrect Owner Security PIN! Access Denied.");
     }
   }
 
