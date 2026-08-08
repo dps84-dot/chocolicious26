@@ -122,35 +122,94 @@ class ChocoApp {
     }
   }
 
+  compressImage(file) {
+    return new Promise((resolve) => {
+      if (!file || !file.type.startsWith('image/')) {
+        resolve(null);
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1000; // Maximum resolution limit for base64 storage optimization
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to JPEG with 0.7 quality
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(compressedDataUrl);
+        };
+        img.onerror = () => resolve(e.target.result); // Fallback
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
   handleFileSelect(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      this.uploadedImageBase64 = event.target.result;
-      this.uploadedFileType = file.type.startsWith('video/') ? 'video' : 'image';
-      
-      const previewBox = document.getElementById('image-preview-box');
-      const previewImg = document.getElementById('preview-img-tag');
-      const previewVid = document.getElementById('preview-video-tag');
-      
-      if (this.uploadedFileType === 'video') {
-        if (previewImg) previewImg.style.display = 'none';
-        if (previewVid) {
-          previewVid.src = this.uploadedImageBase64;
-          previewVid.style.display = 'inline-block';
-        }
-      } else {
+    if (file.type.startsWith('image/')) {
+      this.compressImage(file).then(compressedBase64 => {
+        this.uploadedImageBase64 = compressedBase64 || "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=600";
+        this.uploadedFileType = 'image';
+        
+        const previewBox = document.getElementById('image-preview-box');
+        const previewImg = document.getElementById('preview-img-tag');
+        const previewVid = document.getElementById('preview-video-tag');
+        
         if (previewVid) previewVid.style.display = 'none';
         if (previewImg) {
           previewImg.src = this.uploadedImageBase64;
           previewImg.style.display = 'inline-block';
         }
+        if (previewBox) previewBox.style.display = 'block';
+      });
+    } else {
+      // It's a video
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Video file is too large! Please choose a video under 10MB or paste a link.");
+        e.target.value = '';
+        return;
       }
-      if (previewBox) previewBox.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.uploadedImageBase64 = event.target.result;
+        this.uploadedFileType = 'video';
+        
+        const previewBox = document.getElementById('image-preview-box');
+        const previewImg = document.getElementById('preview-img-tag');
+        const previewVid = document.getElementById('preview-video-tag');
+        
+        if (previewImg) previewImg.style.display = 'none';
+        if (previewVid) {
+          previewVid.src = this.uploadedImageBase64;
+          previewVid.style.display = 'inline-block';
+        }
+        if (previewBox) previewBox.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   switchAdminTab(tab) {
@@ -205,15 +264,13 @@ class ChocoApp {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      this.uploadedProductImageBase64 = event.target.result;
+    this.compressImage(file).then(compressedBase64 => {
+      this.uploadedProductImageBase64 = compressedBase64 || "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=600";
       const previewBox = document.getElementById('prod-preview-box');
       const previewImg = document.getElementById('preview-prod-img');
       if (previewImg) previewImg.src = this.uploadedProductImageBase64;
       if (previewBox) previewBox.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+    });
   }
 
   handlePostProduct(e) {
@@ -940,13 +997,6 @@ class ChocoApp {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 5MB limit
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Error: File exceeds the maximum size limit of 5 MB!");
-      e.target.value = '';
-      return;
-    }
-
     const typeSelect = document.getElementById('showcase-media-type').value;
     const isVideoFile = file.type.startsWith('video/');
 
@@ -960,30 +1010,47 @@ class ChocoApp {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      this.uploadedShowcaseBase64 = event.target.result;
-      const previewImg = document.getElementById('preview-showcase-img');
-      const previewVid = document.getElementById('preview-showcase-video');
-      const previewBox = document.getElementById('showcase-preview-box');
+    if (typeSelect === 'image' || file.type.startsWith('image/')) {
+      this.compressImage(file).then(compressedBase64 => {
+        this.uploadedShowcaseBase64 = compressedBase64 || "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=600";
+        
+        const previewImg = document.getElementById('preview-showcase-img');
+        const previewVid = document.getElementById('preview-showcase-video');
+        const previewBox = document.getElementById('showcase-preview-box');
 
-      if (typeSelect === 'video') {
-        if (previewImg) previewImg.style.display = 'none';
-        if (previewVid) {
-          previewVid.src = this.uploadedShowcaseBase64;
-          previewVid.style.display = 'inline-block';
-        }
-      } else {
         if (previewVid) previewVid.style.display = 'none';
         if (previewImg) {
           previewImg.src = this.uploadedShowcaseBase64;
           previewImg.style.display = 'inline-block';
         }
+        if (previewBox) previewBox.style.display = 'block';
+        document.getElementById('showcase-clear-img-btn').style.display = 'inline-block';
+      });
+    } else {
+      // It's a video file, check 10MB limit
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Error: Video file is too large! Please choose a video under 10MB or paste a link.");
+        e.target.value = '';
+        return;
       }
-      if (previewBox) previewBox.style.display = 'block';
-      document.getElementById('showcase-clear-img-btn').style.display = 'inline-block';
-    };
-    reader.readAsDataURL(file);
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.uploadedShowcaseBase64 = event.target.result;
+        const previewImg = document.getElementById('preview-showcase-img');
+        const previewVid = document.getElementById('preview-showcase-video');
+        const previewBox = document.getElementById('showcase-preview-box');
+
+        if (previewImg) previewImg.style.display = 'none';
+        if (previewVid) {
+          previewVid.src = this.uploadedShowcaseBase64;
+          previewVid.style.display = 'inline-block';
+        }
+        if (previewBox) previewBox.style.display = 'block';
+        document.getElementById('showcase-clear-img-btn').style.display = 'inline-block';
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   clearShowcaseImage() {
