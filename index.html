@@ -836,11 +836,31 @@
   </div>
 
   <!-- JavaScript Scripts -->
+  <!-- Lightbox Zoom Modal -->
+  <div class="lightbox-overlay" id="lightbox-modal" onclick="app.closeLightbox(event)">
+    <button class="lightbox-close" onclick="app.closeLightbox(event)">&times;</button>
+    <div class="lightbox-controls">
+      <button onclick="app.zoomLightbox(0.25, event)"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</button>
+      <button onclick="app.zoomLightbox(-0.25, event)"><i class="fa-solid fa-magnifying-glass-minus"></i> Zoom Out</button>
+      <button onclick="app.resetLightboxZoom(event)"><i class="fa-solid fa-arrows-rotate"></i> Reset</button>
+    </div>
+    <div class="lightbox-img-container" id="lightbox-container" 
+         onmousedown="app.startLightboxDrag(event)" 
+         onmousemove="app.dragLightbox(event)" 
+         onmouseup="app.endLightboxDrag()" 
+         onmouseleave="app.endLightboxDrag()"
+         ontouchstart="app.startLightboxTouch(event)"
+         ontouchmove="app.dragLightboxTouch(event)"
+         ontouchend="app.endLightboxDrag()">
+      <img id="lightbox-img" src="" alt="Zoomed view" style="transform: scale(1) translate(0px, 0px); cursor: grab; transition: transform 0.1s ease;">
+    </div>
+  </div>
+
   <!-- Google Firebase Core & Realtime Database SDKs -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-  <script src="data.js?v=3.0"></script>
-  <script src="app.js?v=3.0"></script>
+  <script src="data.js?v=3.5"></script>
+  <script src="app.js?v=3.5"></script>
 </body>
 </html>

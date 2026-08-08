@@ -629,7 +629,7 @@ class ChocoApp {
     container.innerHTML = filtered.map(act => {
       const mediaHtml = act.isVideo 
         ? `<video src="${act.image}" controls loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>`
-        : `<img src="${act.image}" alt="${act.title}" loading="lazy">`;
+        : `<img src="${act.image}" alt="${act.title}" loading="lazy" onclick="app.openLightbox('${act.image}')">`;
 
       return `
         <div class="activity-card">
@@ -666,7 +666,7 @@ class ChocoApp {
     container.innerHTML = filtered.map(p => `
       <div class="product-card">
         <div class="product-thumb">
-          <img src="${p.image}" alt="${p.name}">
+          <img src="${p.image}" alt="${p.name}" onclick="app.openLightbox('${p.image}')">
           ${p.badge ? `<span class="badge badge-gold product-badge-tag">${p.badge}</span>` : ''}
           ${p.eggless ? `<span class="eggless-badge"><i class="fa-solid fa-leaf"></i> 100% Eggless</span>` : ''}
         </div>
@@ -1029,7 +1029,7 @@ class ChocoApp {
 
       const mediaHtml = item.isVideo
         ? `<video src="${item.image}" controls loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>`
-        : `<img src="${item.image}" alt="${item.title}" loading="lazy">`;
+        : `<img src="${item.image}" alt="${item.title}" loading="lazy" onclick="app.openLightbox('${item.image}')">`;
 
       return `
         <div class="product-card" style="border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;">
@@ -1431,6 +1431,92 @@ class ChocoApp {
     } catch(err) {
       console.error("Firebase sync error:", err);
     }
+  }
+
+  // --- LIGHTBOX ZOOM & DRAG SYSTEM ---
+
+  openLightbox(src) {
+    const modal = document.getElementById('lightbox-modal');
+    const img = document.getElementById('lightbox-img');
+    if (!modal || !img) return;
+
+    img.src = src;
+    modal.classList.add('open');
+
+    // Reset zoom state
+    this.lightboxScale = 1;
+    this.lightboxX = 0;
+    this.lightboxY = 0;
+    this.isDraggingLightbox = false;
+    this.updateLightboxTransform();
+  }
+
+  closeLightbox(e) {
+    if (e.target.id === 'lightbox-modal' || e.target.classList.contains('lightbox-close') || e.target.id === 'lightbox-container') {
+      const modal = document.getElementById('lightbox-modal');
+      if (modal) modal.classList.remove('open');
+    }
+  }
+
+  zoomLightbox(amount, e) {
+    if (e) e.stopPropagation();
+    this.lightboxScale = Math.min(Math.max(this.lightboxScale + amount, 0.5), 5);
+    this.updateLightboxTransform();
+  }
+
+  resetLightboxZoom(e) {
+    if (e) e.stopPropagation();
+    this.lightboxScale = 1;
+    this.lightboxX = 0;
+    this.lightboxY = 0;
+    this.updateLightboxTransform();
+  }
+
+  updateLightboxTransform() {
+    const img = document.getElementById('lightbox-img');
+    if (img) {
+      img.style.transform = `scale(${this.lightboxScale}) translate(${this.lightboxX}px, ${this.lightboxY}px)`;
+    }
+  }
+
+  startLightboxDrag(e) {
+    e.preventDefault();
+    if (this.lightboxScale <= 1) return;
+    this.isDraggingLightbox = true;
+    this.startX = e.clientX - this.lightboxX;
+    this.startY = e.clientY - this.lightboxY;
+    
+    const img = document.getElementById('lightbox-img');
+    if (img) img.style.cursor = 'grabbing';
+  }
+
+  dragLightbox(e) {
+    if (!this.isDraggingLightbox) return;
+    this.lightboxX = e.clientX - this.startX;
+    this.lightboxY = e.clientY - this.startY;
+    this.updateLightboxTransform();
+  }
+
+  endLightboxDrag() {
+    this.isDraggingLightbox = false;
+    const img = document.getElementById('lightbox-img');
+    if (img) img.style.cursor = 'grab';
+  }
+
+  startLightboxTouch(e) {
+    if (this.lightboxScale <= 1) return;
+    this.isDraggingLightbox = true;
+    const touch = e.touches[0];
+    this.startX = touch.clientX - this.lightboxX;
+    this.startY = touch.clientY - this.lightboxY;
+  }
+
+  dragLightboxTouch(e) {
+    if (!this.isDraggingLightbox) return;
+    const touch = e.touches[0];
+    this.lightboxX = touch.clientX - this.startX;
+    this.lightboxY = touch.clientY - this.startY;
+    this.updateLightboxTransform();
   }
 }
 

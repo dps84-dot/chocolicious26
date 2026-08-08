@@ -1030,3 +1030,86 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+/* Lightbox Modal & Zoom System Styles */
+.lightbox-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(12, 6, 4, 0.96);
+  z-index: 2500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.lightbox-overlay.open {
+  display: flex;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 24px; right: 28px;
+  font-size: 2.8rem; color: #fff;
+  background: transparent; border: none;
+  cursor: pointer; z-index: 2600;
+  transition: transform 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+.lightbox-close:hover {
+  color: var(--primary-gold);
+  transform: scale(1.1);
+}
+
+.lightbox-controls {
+  position: absolute;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 16px;
+  z-index: 2600;
+  background: rgba(18, 8, 6, 0.88);
+  border: 1px solid var(--primary-gold);
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+.lightbox-controls button {
+  background: transparent;
+  color: #fff; border: none;
+  font-size: 0.88rem; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+  transition: color 0.2s, transform 0.1s;
+}
+
+.lightbox-controls button:hover {
+  color: var(--primary-gold);
+}
+
+.lightbox-controls button:active {
+  transform: scale(0.95);
+}
+
+.lightbox-img-container {
+  width: 90vw; height: 80vh;
+  display: flex; align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.lightbox-img-container img {
+  max-width: 100%; max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: auto;
+}
+
+/* Mouse zoom indications */
+.activity-img-wrapper img, .product-thumb img {
+  cursor: zoom-in;
+}
