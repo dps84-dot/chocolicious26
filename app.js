@@ -10,6 +10,16 @@ class ChocoApp {
     // Load showcase gallery data
     this.showcaseItems = JSON.parse(localStorage.getItem('choco_showcase')) || INITIAL_SHOWCASE_GALLERY;
 
+    // Load Firebase Database config
+    this.firebaseEnabled = localStorage.getItem('choco_firebase_enabled') === 'true';
+    try {
+      this.firebaseConfig = JSON.parse(localStorage.getItem('choco_firebase_config')) || null;
+    } catch(e) {
+      this.firebaseConfig = null;
+    }
+    this.isFirebaseReady = false;
+    this.db = null;
+
     this.isAdminUnlocked = sessionStorage.getItem('choco_admin_unlocked') === 'true';
 
     // Load dynamic config overrides if saved
@@ -24,6 +34,9 @@ class ChocoApp {
   }
 
   init() {
+    // Initialize Firebase if configured
+    this.initFirebase();
+
     // Initial renders
     this.applyBrandConfig();
     this.loadGoogleSettings();
@@ -257,6 +270,14 @@ class ChocoApp {
       document.getElementById('setting-instagram').value = CHOCO_CONFIG.instagramHandle;
       document.getElementById('setting-tagline').value = CHOCO_CONFIG.tagline;
       document.getElementById('setting-pin').value = CHOCO_CONFIG.adminPin;
+
+      document.getElementById('setting-firebase-enable').checked = this.firebaseEnabled;
+      const savedConfigText = localStorage.getItem('choco_firebase_config');
+      try {
+        document.getElementById('setting-firebase-config').value = savedConfigText ? JSON.stringify(JSON.parse(savedConfigText), null, 2) : '';
+      } catch(err) {
+        document.getElementById('setting-firebase-config').value = savedConfigText || '';
+      }
     }
   }
 
@@ -393,6 +414,7 @@ class ChocoApp {
 
     this.activities.unshift(newActivity);
     localStorage.setItem('choco_activities', JSON.stringify(this.activities));
+    this.saveData('activities');
 
     this.renderActivities('all');
     this.closeAdminModal();
@@ -439,6 +461,7 @@ class ChocoApp {
 
     this.reviews.unshift(newRev);
     localStorage.setItem('choco_reviews', JSON.stringify(this.reviews));
+    this.saveData('reviews');
     
     this.renderReviews();
     this.renderAdminManageReviews();
@@ -451,6 +474,7 @@ class ChocoApp {
 
     this.reviews = this.reviews.filter(r => r.id !== revId);
     localStorage.setItem('choco_reviews', JSON.stringify(this.reviews));
+    this.saveData('reviews');
 
     this.renderReviews();
     this.renderAdminManageReviews();
@@ -513,6 +537,7 @@ class ChocoApp {
 
     this.activities = this.activities.filter(a => a.id !== actId);
     localStorage.setItem('choco_activities', JSON.stringify(this.activities));
+    this.saveData('activities');
 
     this.renderActivities('all');
     this.renderAdminManagePosts();
@@ -535,7 +560,46 @@ class ChocoApp {
       adminPin: CHOCO_CONFIG.adminPin
     }));
 
+    // Save Firebase settings
+    const fbEnable = document.getElementById('setting-firebase-enable').checked;
+    const fbConfigRaw = document.getElementById('setting-firebase-config').value.trim();
+
+    localStorage.setItem('choco_firebase_enabled', fbEnable ? 'true' : 'false');
+    this.firebaseEnabled = fbEnable;
+
+    if (fbConfigRaw) {
+      try {
+        const parsed = JSON.parse(fbConfigRaw);
+        localStorage.setItem('choco_firebase_config', JSON.stringify(parsed));
+        this.firebaseConfig = parsed;
+      } catch (err) {
+        alert("Warning: Firebase Config is not a valid JSON object! Please double-check formatting.");
+        return;
+      }
+    } else {
+      localStorage.removeItem('choco_firebase_config');
+      this.firebaseConfig = null;
+    }
+
+    // Re-initialize or disconnect Firebase
+    if (this.firebaseEnabled && this.firebaseConfig) {
+      this.initFirebase();
+    } else {
+      this.isFirebaseReady = false;
+      this.db = null;
+      if (firebase.apps.length > 0) {
+        try {
+          firebase.app().delete().then(() => {
+            console.log("Firebase App disconnected.");
+          });
+        } catch(e) {
+          console.log("Error disconnecting Firebase:", e);
+        }
+      }
+    }
+
     this.applyBrandConfig();
+    this.saveData('config');
     this.showToast("⚙️ Business Profile Details Saved!");
     this.closeAdminModal();
   }
@@ -886,6 +950,7 @@ class ChocoApp {
 
     this.activities.unshift(newActivity);
     localStorage.setItem('choco_activities', JSON.stringify(this.activities));
+    this.saveData('activities');
 
     this.renderActivities('all');
     this.closeAdminModal();
@@ -910,6 +975,7 @@ class ChocoApp {
 
     act.likes = (act.likes || 0) + 1;
     localStorage.setItem('choco_activities', JSON.stringify(this.activities));
+    this.saveData('activities');
     
     const countEl = btnEl.querySelector('.like-count');
     if (countEl) countEl.innerText = act.likes;
@@ -1135,6 +1201,7 @@ class ChocoApp {
     }
 
     localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+    this.saveData('showcase');
     this.cancelShowcaseEdit();
     this.renderShowcase('all');
     this.renderAdminShowcaseList();
@@ -1190,6 +1257,7 @@ class ChocoApp {
 
     this.showcaseItems = this.showcaseItems.filter(i => i.id !== id);
     localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+    this.saveData('showcase');
 
     this.renderShowcase('all');
     this.renderAdminShowcaseList();
@@ -1211,6 +1279,7 @@ class ChocoApp {
     }
 
     localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+    this.saveData('showcase');
     this.renderShowcase('all');
     this.renderAdminShowcaseList();
   }
@@ -1274,6 +1343,94 @@ class ChocoApp {
         </div>
       `;
     }).join('');
+  }
+
+  // --- GOOGLE FIREBASE CLOUD DATABASE GATEWAY ---
+
+  initFirebase() {
+    if (this.firebaseEnabled && this.firebaseConfig) {
+      try {
+        if (firebase.apps.length === 0) {
+          firebase.initializeApp(this.firebaseConfig);
+        }
+        this.db = firebase.database();
+        this.isFirebaseReady = true;
+        console.log("Google Firebase database successfully connected!");
+        this.syncFromFirebase();
+      } catch (err) {
+        console.error("Failed to initialize Firebase:", err);
+        this.isFirebaseReady = false;
+      }
+    }
+  }
+
+  syncFromFirebase() {
+    if (!this.isFirebaseReady) return;
+
+    // 1. Sync Config
+    this.db.ref('config').once('value').then(snapshot => {
+      const cloudConfig = snapshot.val();
+      if (cloudConfig) {
+        Object.assign(CHOCO_CONFIG, cloudConfig);
+        this.applyBrandConfig();
+      } else {
+        this.db.ref('config').set(CHOCO_CONFIG);
+      }
+    });
+
+    // 2. Sync Activities (Diaries Feed)
+    this.db.ref('activities').on('value', (snapshot) => {
+      const cloudActs = snapshot.val();
+      if (cloudActs) {
+        this.activities = Array.isArray(cloudActs) ? cloudActs : Object.values(cloudActs);
+        this.activities.sort((a, b) => b.id.localeCompare(a.id));
+        localStorage.setItem('choco_activities', JSON.stringify(this.activities));
+        this.renderActivities('all');
+      } else {
+        this.db.ref('activities').set(this.activities);
+      }
+    });
+
+    // 3. Sync Showcase Items
+    this.db.ref('showcase').on('value', (snapshot) => {
+      const cloudShowcase = snapshot.val();
+      if (cloudShowcase) {
+        this.showcaseItems = Array.isArray(cloudShowcase) ? cloudShowcase : Object.values(cloudShowcase);
+        localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+        this.renderShowcase('all');
+      } else {
+        this.db.ref('showcase').set(this.showcaseItems);
+      }
+    });
+
+    // 4. Sync Reviews
+    this.db.ref('reviews').on('value', (snapshot) => {
+      const cloudReviews = snapshot.val();
+      if (cloudReviews) {
+        this.reviews = Array.isArray(cloudReviews) ? cloudReviews : Object.values(cloudReviews);
+        localStorage.setItem('choco_reviews', JSON.stringify(this.reviews));
+        this.renderReviews();
+      } else {
+        this.db.ref('reviews').set(this.reviews);
+      }
+    });
+  }
+
+  saveData(type) {
+    if (!this.isFirebaseReady) return;
+    try {
+      if (type === 'activities') {
+        this.db.ref('activities').set(this.activities);
+      } else if (type === 'showcase') {
+        this.db.ref('showcase').set(this.showcaseItems);
+      } else if (type === 'reviews') {
+        this.db.ref('reviews').set(this.reviews);
+      } else if (type === 'config') {
+        this.db.ref('config').set(CHOCO_CONFIG);
+      }
+    } catch(err) {
+      console.error("Firebase sync error:", err);
+    }
   }
 }
 

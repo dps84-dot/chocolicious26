@@ -753,6 +753,31 @@
               <input type="text" id="setting-pin" class="form-control" required>
             </div>
 
+            <!-- Firebase Connection Config Block -->
+            <div style="margin: 24px 0 16px; border-top: 1px dashed rgba(212,175,55,0.25); padding-top: 16px;">
+              <h4 class="text-gold" style="font-size: 1.05rem; margin-bottom: 6px;"><i class="fa-solid fa-cloud"></i> Google Firebase Database</h4>
+              <p style="color: var(--text-muted); font-size: 0.78rem; margin-bottom: 12px;">Connect a free Firebase Realtime Database to store photos, videos, reviews, and settings permanently so all visitors see them globally.</p>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+              <input type="checkbox" id="setting-firebase-enable" style="width: 18px; height: 18px; cursor: pointer;">
+              <label for="setting-firebase-enable" class="form-label" style="margin-bottom: 0; cursor: pointer; font-weight: 600; color: #fff;">Enable Firebase Cloud Database</label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Firebase Configuration Snippet (JSON format) *</label>
+              <textarea id="setting-firebase-config" class="form-control" rows="5" placeholder='Paste your Firebase Configuration object here:
+{
+  "apiKey": "AIzaSy...",
+  "authDomain": "your-project.firebaseapp.com",
+  "databaseURL": "https://your-project-default-rtdb.firebaseio.com",
+  "projectId": "your-project",
+  "storageBucket": "your-project.appspot.com",
+  "messagingSenderId": "...",
+  "appId": "..."
+}' style="font-family: monospace; font-size: 0.8rem;"></textarea>
+            </div>
+
             <button type="submit" class="btn btn-gold" style="width: 100%;">Save Business Profile Details 💾</button>
           </form>
         </div>
@@ -811,7 +836,11 @@
   </div>
 
   <!-- JavaScript Scripts -->
-  <script src="data.js?v=2.5"></script>
-  <script src="app.js?v=2.5"></script>
+  <!-- Google Firebase Core & Realtime Database SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script src="data.js?v=3.0"></script>
+  <script src="app.js?v=3.0"></script>
 </body>
 </html>
