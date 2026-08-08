@@ -488,10 +488,11 @@ button {
   overflow: hidden;
 }
 
-.activity-img-wrapper img {
+.activity-img-wrapper img, .activity-img-wrapper video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #0d0605;
 }
 
 .activity-time-tag {
@@ -574,10 +575,11 @@ button {
   overflow: hidden;
 }
 
-.product-thumb img {
+.product-thumb img, .product-thumb video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #0d0605;
   transition: transform 0.4s ease;
 }
 
