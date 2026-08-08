@@ -192,7 +192,7 @@ const INITIAL_SHOWCASE_GALLERY = [
     title: "🍫 Royal Gulkand Chocolate Bites",
     category: "gulkand-chocolates",
     description: "Rich white chocolate cups filled with pure organic sweet gulkand.",
-    image: "https://images.unsplash.com/photo-1548907040-4d42b52125ea?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=600",
     isVideo: false,
     date: "Today"
   },
@@ -201,7 +201,7 @@ const INITIAL_SHOWCASE_GALLERY = [
     title: "🎂 Gold Pearl Anniversary Cake",
     category: "anniversary-cakes",
     description: "Moist chocolate truffle cake decorated with gold dust and edible pearls.",
-    image: "https://images.unsplash.com/photo-1535141192574-5d4897c13636?auto=format&fit=crop&q=80&w=600",
+    image: "https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=600",
     isVideo: false,
     date: "Yesterday"
   },

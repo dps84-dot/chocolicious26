@@ -9,6 +9,22 @@ class ChocoApp {
 
     // Load showcase gallery data
     this.showcaseItems = JSON.parse(localStorage.getItem('choco_showcase')) || INITIAL_SHOWCASE_GALLERY;
+    // Auto-fix broken Unsplash image URLs in local showcase items
+    let didMigrateShowcase = false;
+    this.showcaseItems = this.showcaseItems.map(item => {
+      if (item.image && item.image.includes('photo-1548907040-4d42b52125ea')) {
+        item.image = 'https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=600';
+        didMigrateShowcase = true;
+      }
+      if (item.image && item.image.includes('photo-1535141192574-5d4897c13636')) {
+        item.image = 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=600';
+        didMigrateShowcase = true;
+      }
+      return item;
+    });
+    if (didMigrateShowcase) {
+      localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+    }
 
     // Load Firebase Database config
     this.firebaseEnabled = localStorage.getItem('choco_firebase_enabled') === 'true';
@@ -1396,7 +1412,26 @@ class ChocoApp {
       const cloudShowcase = snapshot.val();
       if (cloudShowcase) {
         this.showcaseItems = Array.isArray(cloudShowcase) ? cloudShowcase : Object.values(cloudShowcase);
+        
+        // Auto-fix broken Unsplash image URLs in showcase items from database
+        let didMigrateShowcase = false;
+        this.showcaseItems = this.showcaseItems.map(item => {
+          if (item.image && item.image.includes('photo-1548907040-4d42b52125ea')) {
+            item.image = 'https://images.unsplash.com/photo-1548907040-4baa42d10919?auto=format&fit=crop&q=80&w=600';
+            didMigrateShowcase = true;
+          }
+          if (item.image && item.image.includes('photo-1535141192574-5d4897c13636')) {
+            item.image = 'https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=600';
+            didMigrateShowcase = true;
+          }
+          return item;
+        });
+
         localStorage.setItem('choco_showcase', JSON.stringify(this.showcaseItems));
+        if (didMigrateShowcase) {
+          this.saveData('showcase');
+        }
+        
         this.renderShowcase('all');
       } else {
         this.db.ref('showcase').set(this.showcaseItems);
