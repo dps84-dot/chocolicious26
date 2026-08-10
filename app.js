@@ -529,9 +529,7 @@ class ChocoApp {
     }
 
     listEl.innerHTML = this.activities.map(act => {
-      const thumbHtml = act.isVideo
-        ? `<video src="${act.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;" muted></video>`
-        : `<img src="${act.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">`;
+      const thumbHtml = this.getMediaThumbHTML(act.image, act.isVideo, 50);
 
       return `
         <div style="background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(212, 175, 55, 0.2); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
@@ -643,9 +641,7 @@ class ChocoApp {
     }
 
     container.innerHTML = filtered.map(act => {
-      const mediaHtml = act.isVideo 
-        ? `<video src="${act.image}" controls loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>`
-        : `<img src="${act.image}" alt="${act.title}" loading="lazy" onclick="app.openLightbox('${act.image}')">`;
+      const mediaHtml = this.getMediaHTML(act.image, act.title, act.isVideo);
 
       return `
         <div class="activity-card">
@@ -1043,9 +1039,7 @@ class ChocoApp {
       const catName = catObj ? catObj.name : "Custom Design";
       const catGroup = catObj ? catObj.group : "Showcase";
 
-      const mediaHtml = item.isVideo
-        ? `<video src="${item.image}" controls loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>`
-        : `<img src="${item.image}" alt="${item.title}" loading="lazy" onclick="app.openLightbox('${item.image}')">`;
+      const mediaHtml = this.getMediaHTML(item.image, item.title, item.isVideo);
 
       return `
         <div class="product-card" style="border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; display: flex; flex-direction: column;">
@@ -1333,9 +1327,7 @@ class ChocoApp {
     }
 
     listEl.innerHTML = filtered.map(item => {
-      const mediaThumb = item.isVideo
-        ? `<video src="${item.image}" style="width: 46px; height: 46px; object-fit: cover; border-radius: 6px;" muted></video>`
-        : `<img src="${item.image}" style="width: 46px; height: 46px; object-fit: cover; border-radius: 6px;">`;
+      const mediaThumb = this.getMediaThumbHTML(item.image, item.isVideo);
 
       // Get readable category name
       const catObj = INITIAL_SHOWCASE_CATEGORIES.find(c => c.id === item.category);
@@ -1552,6 +1544,50 @@ class ChocoApp {
     this.lightboxX = touch.clientX - this.startX;
     this.lightboxY = touch.clientY - this.startY;
     this.updateLightboxTransform();
+  }
+
+  // --- GENERAL VIDEO EMBED & THUMBNAIL PARSERS ---
+
+  getMediaHTML(url, title, isVideo = false) {
+    if (!isVideo) {
+      return `<img src="${url}" alt="${title}" loading="lazy" onclick="app.openLightbox('${url}')">`;
+    }
+    
+    // Check if it is a YouTube link
+    let youtubeId = null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      youtubeId = match[2];
+    }
+    
+    if (youtubeId) {
+      return `<iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=0&mute=1&loop=1&playlist=${youtubeId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%; object-fit: contain; display: block; border-radius: var(--radius-md); background: #000;"></iframe>`;
+    }
+    
+    // Default to direct video tag
+    return `<video src="${url}" controls loop muted playsinline style="width: 100%; height: 100%; object-fit: contain; display: block; background: #000;"></video>`;
+  }
+
+  getMediaThumbHTML(url, isVideo = false, size = 46) {
+    if (!isVideo) {
+      return `<img src="${url}" style="width: ${size}px; height: ${size}px; object-fit: cover; border-radius: 6px;">`;
+    }
+    
+    // Check if YouTube
+    let youtubeId = null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      youtubeId = match[2];
+    }
+    
+    if (youtubeId) {
+      const thumbUrl = `https://img.youtube.com/vi/${youtubeId}/default.jpg`;
+      return `<img src="${thumbUrl}" style="width: ${size}px; height: ${size}px; object-fit: cover; border-radius: 6px;">`;
+    }
+    
+    return `<video src="${url}" style="width: ${size}px; height: ${size}px; object-fit: cover; border-radius: 6px;" muted></video>`;
   }
 }
 
