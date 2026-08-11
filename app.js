@@ -1,7 +1,13 @@
 // Choco.olicious26 Main Application Engine
 
+const GA4_MEASUREMENT_ID = '__GA4_MEASUREMENT_ID__';
+
 class ChocoApp {
   constructor() {
+    this.gaEnabled = false;
+    this.gaMeasurementId = '';
+    this.initGoogleAnalytics(GA4_MEASUREMENT_ID);
+
     this.cart = JSON.parse(localStorage.getItem('choco_cart')) || [];
     this.activities = JSON.parse(localStorage.getItem('choco_activities')) || INITIAL_ACTIVITIES;
     this.products = JSON.parse(localStorage.getItem('choco_products')) || INITIAL_PRODUCTS;
@@ -142,6 +148,9 @@ class ChocoApp {
     
     document.getElementById('confirm-wa-submit').addEventListener('click', () => this.processWhatsAppOrder());
     document.getElementById('checkout-form').addEventListener('submit', (e) => this.processWebOrder(e));
+    
+    // Bind dynamic analytics click/interaction trackers
+    this.bindAnalyticsEvents();
   }
 
   toggleMobileMenu() {
@@ -827,6 +836,13 @@ class ChocoApp {
     const product = this.products.find(p => p.id === productId);
     if (!product) return;
 
+    this.trackEvent('product_enquiry', {
+      product_id: productId,
+      product_name: product.name,
+      value: product.price,
+      currency: 'INR'
+    });
+
     const message = `Hi *Choco.olicious26*! 🍫\nI want to order:\n• *${product.name}* (Price: ₹${product.price})\n\nPlease let me know availability and payment details. Thank you!`;
     const url = `https://wa.me/${CHOCO_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
@@ -881,6 +897,12 @@ class ChocoApp {
     message += `----------------------------------------\n`;
     message += `Please confirm my order. Thank you! ✨`;
 
+    this.trackEvent('whatsapp_order_submit', {
+      value: total,
+      currency: 'INR',
+      items_count: this.cart.length
+    });
+
     const url = `https://wa.me/${CHOCO_CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
 
@@ -894,6 +916,12 @@ class ChocoApp {
     e.preventDefault();
     const name = document.getElementById('cust-name').value.trim();
     
+    this.trackEvent('web_order_submit', {
+      value: this.calculateTotal(),
+      currency: 'INR',
+      items_count: this.cart.length
+    });
+
     alert(`🎉 Thank you ${name}! Your order has been placed successfully on Choco.olicious26!\nOur team will contact you on WhatsApp (+91 97548 81990) for dispatch details.`);
     
     this.closeCheckoutModal();
@@ -1588,6 +1616,131 @@ class ChocoApp {
     }
     
     return `<video src="${url}" style="width: ${size}px; height: ${size}px; object-fit: cover; border-radius: 6px;" muted></video>`;
+  }
+
+  // --- GOOGLE ANALYTICS 4 (GA4) INTEGRATION ---
+
+  initGoogleAnalytics(measurementId) {
+    if (!measurementId || measurementId === '__GA4_MEASUREMENT_ID__' || measurementId.trim() === '') {
+      console.warn("Google Analytics 4 Measurement ID is not configured (or waiting for Vercel injection). Tracking disabled.");
+      return;
+    }
+
+    try {
+      // Create script tag dynamically (lightweight and async)
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+      document.head.appendChild(script);
+
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function() {
+        window.dataLayer.push(arguments);
+      };
+
+      window.gtag('js', new Date());
+
+      // Config GA4 with privacy safeguards (IP anonymization)
+      window.gtag('config', measurementId, {
+        anonymize_ip: true,
+        cookie_flags: 'SameSite=None;Secure'
+      });
+
+      this.gaEnabled = true;
+      this.gaMeasurementId = measurementId;
+      console.log(`GA4 successfully loaded with ID: ${measurementId}`);
+    } catch (e) {
+      console.error("Failed to initialize GA4:", e);
+      this.gaEnabled = false;
+    }
+  }
+
+  trackEvent(eventName, eventParams = {}) {
+    if (this.gaEnabled && typeof window.gtag === 'function') {
+      try {
+        // Enforce strict privacy: Never send customer names, phones, notes, address text to GA
+        const sanitizedParams = { ...eventParams };
+        delete sanitizedParams.name;
+        delete sanitizedParams.phone;
+        delete sanitizedParams.address;
+        delete sanitizedParams.note;
+        delete sanitizedParams.custName;
+        delete sanitizedParams.custPhone;
+        delete sanitizedParams.custAddress;
+        delete sanitizedParams.custNote;
+
+        window.gtag('event', eventName, sanitizedParams);
+        console.log(`[GA4 Event] ${eventName}:`, sanitizedParams);
+      } catch (err) {
+        console.error(`Failed to track GA4 event: ${eventName}`, err);
+      }
+    }
+  }
+
+  bindAnalyticsEvents() {
+    // 1. WhatsApp, Call Links, and Social links clicks (using event delegation)
+    document.addEventListener('click', (e) => {
+      const anchor = e.target.closest('a');
+      if (!anchor) return;
+
+      const href = anchor.href || '';
+      
+      // WhatsApp Click Trackers
+      if (href.includes('wa.me') || href.includes('whatsapp.com')) {
+        let location = 'other';
+        if (anchor.closest('footer')) location = 'footer';
+        else if (anchor.closest('.hero-section') || anchor.closest('.hero-content') || anchor.closest('.hero-card-display')) location = 'hero';
+        else if (anchor.closest('#activities')) location = 'daily_diaries';
+        else if (anchor.closest('#showcase')) location = 'showcase';
+        else if (anchor.closest('#cart-drawer')) location = 'cart_drawer';
+        else if (anchor.closest('#checkout-modal')) location = 'checkout_modal';
+
+        this.trackEvent('whatsapp_click', {
+          button_location: location
+        });
+      }
+      
+      // Call/Phone Click Trackers
+      else if (href.startsWith('tel:')) {
+        this.trackEvent('phone_click', {
+          button_location: anchor.closest('footer') ? 'footer' : 'other'
+        });
+      }
+
+      // Instagram DM Clicks
+      else if (href.includes('instagram.com')) {
+        let location = 'other';
+        if (anchor.closest('footer')) location = 'footer';
+        else if (anchor.closest('#custom-order')) location = 'order_banner';
+
+        this.trackEvent('social_link_click', {
+          platform: 'instagram',
+          button_location: location
+        });
+      }
+    });
+
+    // 2. Section views via Navigation/Footer links clicks
+    document.querySelectorAll('.nav-link, .footer-links a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const href = e.currentTarget.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          this.trackEvent('section_view', {
+            section_name: href.replace('#', '')
+          });
+        }
+      });
+    });
+
+    // 3. Admin dashboard tab switching
+    // Intercept switchAdminTab calls
+    const originalSwitchAdminTab = this.switchAdminTab;
+    this.switchAdminTab = (tab) => {
+      originalSwitchAdminTab.call(this, tab);
+      this.trackEvent('admin_tab_view', {
+        tab_name: tab
+      });
+    };
   }
 }
 
